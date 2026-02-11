@@ -1,0 +1,368 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Light Theme - Tulip/Purple Gradient */
+    --color-background-start: #f6f6f6;
+    --color-background-mid: #fcfcfc;
+    --color-background-end: #fdfdfd;
+
+    /* Text colors */
+    --color-foreground: #2D2D44;
+    --color-secondary-text: #6B6B85;
+
+    /* Card - Glass morphism */
+    --color-card: rgba(255, 255, 255, 0.15);
+    --color-card-foreground: #2D2D44;
+
+    /* Primary - Purple */
+    --color-primary: #9D7CC4;
+    --color-primary-dark: #7B68EE;
+    --color-primary-foreground: #ffffff;
+
+    /* Secondary */
+    --color-secondary: #f4f4f5;
+    --color-secondary-foreground: #2D2D44;
+
+    /* Muted */
+    --color-muted: rgba(255, 255, 255, 0.15);
+    --color-muted-foreground: #6B6B85;
+
+    /* Destructive - red */
+    --color-destructive: #ef4444;
+    --color-destructive-foreground: #ffffff;
+
+    /* Success - green */
+    --color-success: #10b981;
+    --color-success-foreground: #ffffff;
+
+    /* Border - subtle glass */
+    --color-border: rgba(255, 255, 255, 0.25);
+
+    /* Input */
+    --color-input: rgba(255, 255, 255, 0.1);
+
+    /* Ring - gradient purple */
+    --color-ring: #9D7CC4;
+
+    /* Shadow */
+    --shadow-glass: 0 8px 32px rgba(157, 124, 196, 0.15);
+
+    /* Radius */
+    --radius: 1rem;
+  }
+
+  .dark {
+    /* Dark Theme - Deep Purple Gradient */
+    --color-background-start: #1A0B2E;
+    --color-background-mid: #2D1B4E;
+    --color-background-end: #3E2C5F;
+
+    /* Text colors */
+    --color-foreground: #F5F5FA;
+    --color-secondary-text: #B8B8D0;
+
+    /* Card - Glass morphism dark */
+    --color-card: rgba(255, 255, 255, 0.08);
+    --color-card-foreground: #F5F5FA;
+
+    /* Primary - Purple (same but brighter) */
+    --color-primary: #9D7CC4;
+    --color-primary-dark: #7B68EE;
+    --color-primary-foreground: #ffffff;
+
+    /* Secondary */
+    --color-secondary: rgba(255, 255, 255, 0.05);
+    --color-secondary-foreground: #F5F5FA;
+
+    /* Muted */
+    --color-muted: rgba(255, 255, 255, 0.08);
+    --color-muted-foreground: #B8B8D0;
+
+    /* Border - subtle glass dark */
+    --color-border: rgba(255, 255, 255, 0.1);
+
+    /* Input */
+    --color-input: rgba(255, 255, 255, 0.05);
+
+    /* Shadow */
+    --shadow-glass: 0 8px 32px rgba(0, 0, 0, 0.3);
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-feature-settings: 'rlig' 1, 'calt' 1;
+    color: var(--color-foreground);
+    /* Gradient background */
+    background: linear-gradient(
+      135deg,
+      var(--color-background-start) 0%,
+      var(--color-background-mid) 50%,
+      var(--color-background-end) 100%
+    );
+    background-attachment: fixed;
+    min-height: 100vh;
+  }
+
+  /* Smooth transitions for theme switching */
+  body,
+  .glass-panel,
+  .glass-card,
+  .glass-modal {
+    transition: background-color 0.5s ease, color 0.5s ease, border-color 0.5s ease;
+  }
+}
+
+@layer utilities {
+  /* Glass Effect - Enhanced for Req-Assist */
+  .glass-panel {
+    background: var(--color-card);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid var(--color-border);
+    box-shadow: var(--shadow-glass);
+  }
+
+  .glass-card {
+    background: var(--color-card);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    border: 1px solid var(--color-border);
+    box-shadow: var(--shadow-glass);
+  }
+
+  .glass-modal {
+    background: var(--color-card);
+    backdrop-filter: blur(24px);
+    -webkit-backdrop-filter: blur(24px);
+    border: 1px solid var(--color-border);
+  }
+
+  /* Gradient Text */
+  .gradient-text {
+    background: linear-gradient(135deg, var(--color-primary-dark) 0%, var(--color-primary) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  /* Gradient Border */
+  .gradient-border {
+    border-image: linear-gradient(135deg, var(--color-primary-dark), var(--color-primary)) 1;
+  }
+
+  /* Gradient Background */
+  .gradient-bg {
+    background: linear-gradient(135deg, var(--color-primary-dark) 0%, var(--color-primary) 100%);
+  }
+
+  /* Animations */
+  .reveal {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+  }
+
+  .reveal.active {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* Hover Effects */
+  .hover-lift {
+    transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  .hover-lift:hover {
+    transform: translateY(-8px) scale(1.02);
+    box-shadow: 0 20px 60px rgba(157, 124, 196, 0.25);
+  }
+
+  .hover-glow {
+    transition: box-shadow 0.3s ease, transform 0.3s ease;
+  }
+
+  .hover-glow:hover {
+    box-shadow: 0 0 30px rgba(157, 124, 196, 0.4);
+    transform: scale(1.05);
+  }
+
+  .hover-scale {
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  .hover-scale:hover {
+    transform: scale(1.02);
+  }
+
+  .hover-scale:active {
+    transform: scale(0.98);
+  }
+
+  /* Focus Styles */
+  .focus-ring {
+    @apply focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2;
+  }
+
+  .focus-glow {
+    transition: all 0.3s ease;
+  }
+
+  .focus-glow:focus {
+    outline: none;
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px rgba(157, 124, 196, 0.3);
+    transform: translateY(-2px);
+  }
+
+  /* Button Ripple Effect */
+  .btn-ripple {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .btn-ripple::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.5);
+    transform: translate(-50%, -50%);
+    transition: width 0.6s, height 0.6s;
+  }
+
+  .btn-ripple:active::after {
+    width: 300px;
+    height: 300px;
+  }
+}
+
+/* Custom Animations */
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slideInLeft {
+  from {
+    opacity: 0;
+    transform: translateX(-100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+  20%, 40%, 60%, 80% { transform: translateX(5px); }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes gradientRotate {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.animate-fade-up {
+  animation: fadeUp 0.6s ease-out forwards;
+  opacity: 0;
+}
+
+.animate-slide-in-right {
+  animation: slideInRight 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+.animate-slide-in-left {
+  animation: slideInLeft 0.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+.animate-scale-in {
+  animation: scaleIn 0.3s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  opacity: 0;
+}
+
+.animate-shake {
+  animation: shake 0.5s ease-in-out;
+}
+
+.animate-pulse {
+  animation: pulse 2s ease-in-out infinite;
+}
+
+.animate-spin {
+  animation: spin 1s linear infinite;
+}
+
+/* Stagger Delays */
+.stagger-1 { animation-delay: 0.1s; }
+.stagger-2 { animation-delay: 0.2s; }
+.stagger-3 { animation-delay: 0.3s; }
+.stagger-4 { animation-delay: 0.4s; }
+.stagger-5 { animation-delay: 0.5s; }
+
+/* Reduced Motion Support */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
