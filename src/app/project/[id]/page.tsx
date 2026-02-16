@@ -243,11 +243,15 @@ export default function ProjectPage() {
   const queryTitle = searchParams.get('title');
   const queryWorkspace = searchParams.get('workspace');
   const queryWorkspaceId = searchParams.get('workspaceId');
+  const initialQuery = searchParams.get('query');
+  const actionType = searchParams.get('action');
+  const applicationName = searchParams.get('application');
 
   // Core state
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputValue, setInputValue] = useState('');
   const [showCommandPalette, setShowCommandPalette] = useState(false);
+  const [hasInitialized, setHasInitialized] = useState(false);
   const [selectedCommandIndex, setSelectedCommandIndex] = useState(0);
   const [isGenerating, setIsGenerating] = useState(false);
   const [currentStep, setCurrentStep] = useState(0);
@@ -398,24 +402,25 @@ export default function ProjectPage() {
       await new Promise((resolve) => setTimeout(resolve, 2000));
     }
 
-    // Generate mock research sections
+    // Generate mock research sections with unique IDs based on timestamp
+    const timestamp = Date.now();
     const mockSections: ResearchSection[] = [
       {
-        id: '1',
+        id: `${timestamp}-1`,
         title: 'Executive Summary',
         content:
           'The market shows significant growth potential with emerging opportunities in AI and machine learning sectors. Key findings indicate a 25% YoY growth rate with strong investor interest.',
         icon: 'clipboard',
       },
       {
-        id: '2',
+        id: `${timestamp}-2`,
         title: 'Market Overview',
         content:
           'Current market size is estimated at $50B with projected growth to $75B by 2027. Major players include established tech giants and innovative startups disrupting traditional models.',
         icon: 'globe',
       },
       {
-        id: '3',
+        id: `${timestamp}-3`,
         title: 'Competitive Analysis',
         content:
           'Top competitors identified: Company A (30% market share), Company B (25%), Company C (15%). Each competitor brings unique value propositions and technological advantages.',
@@ -423,6 +428,20 @@ export default function ProjectPage() {
       },
     ];
 
+    // Add sections to the last user message instead of global state
+    setMessages(prev => {
+      const updated = [...prev];
+      // Find the last user message and add sections to it
+      for (let i = updated.length - 1; i >= 0; i--) {
+        if (updated[i].role === 'user' && !updated[i].sections) {
+          updated[i] = { ...updated[i], sections: mockSections };
+          break;
+        }
+      }
+      return updated;
+    });
+    
+    // Also update global researchSections for the side panel features
     setResearchSections(mockSections);
     setIsGenerating(false);
     setCurrentStep(0);
@@ -438,6 +457,48 @@ export default function ProjectPage() {
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
+
+  // Auto-initialize from URL query params (from homepage)
+  useEffect(() => {
+    if (hasInitialized) return;
+    
+    if (initialQuery && initialQuery.trim()) {
+      // Set the query as user message and start research
+      const userMessage: Message = {
+        id: Date.now().toString(),
+        role: 'user',
+        content: initialQuery,
+        timestamp: new Date(),
+      };
+      setMessages([userMessage]);
+      setHasConfigured(true); // Skip config modal for queries from homepage
+      setHasInitialized(true);
+      
+      // Start research generation after a short delay
+      setTimeout(() => {
+        startResearchGeneration();
+      }, 500);
+    } else if (actionType && applicationName) {
+      // Handle action-based navigation (Search KB, Initiate Change)
+      const actionText = actionType === 'search-kb' 
+        ? `Searching Knowledge Base for ${applicationName}...`
+        : `Initiating change request for ${applicationName}...`;
+      
+      const userMessage: Message = {
+        id: Date.now().toString(),
+        role: 'user',
+        content: actionText,
+        timestamp: new Date(),
+      };
+      setMessages([userMessage]);
+      setHasConfigured(true);
+      setHasInitialized(true);
+      
+      setTimeout(() => {
+        startResearchGeneration();
+      }, 500);
+    }
+  }, [initialQuery, actionType, applicationName, hasInitialized]);
 
   const steps = [
     'Analyzing query...',
@@ -744,7 +805,7 @@ export default function ProjectPage() {
           <div className="flex-1 flex flex-col h-[calc(100vh-144px)]">
             {/* Chat Messages / Research Output */}
             <div className="flex-1 overflow-y-auto p-6 relative z-10">
-              {researchSections.length === 0 && messages.length === 0 && !isGenerating ? (
+              {messages.length === 0 && !isGenerating ? (
                 /* Empty State */
                 <motion.div
                   initial={{ opacity: 0, y: 20 }}
@@ -821,111 +882,118 @@ export default function ProjectPage() {
               ) : (
                 /* Chat Messages + Research Sections */
                 <div className="max-w-4xl mx-auto space-y-6">
-                  {/* Messages */}
+                  {/* Messages with their associated research sections */}
                   {messages.map((message) => (
-                    <motion.div
-                      key={message.id}
-                      initial={{ opacity: 0, y: 10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
-                    >
-                      <div className={`max-w-[80%] ${message.role === 'user' ? '' : ''}`}>
-                        <div
-                          className={`px-5 py-4 rounded-2xl ${
-                            message.role === 'user' 
-                              ? 'gradient-bg text-white ml-auto' 
-                              : 'glass-card'
-                          }`}
-                        >
-                          <p className="text-sm leading-relaxed">{message.content}</p>
-                        </div>
-                        <span className={`text-xs mt-1 block ${message.role === 'user' ? 'text-right' : ''}`} style={{ color: 'var(--color-secondary-text)' }}>
-                          {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                        </span>
-                      </div>
-                    </motion.div>
-                  ))}
-
-                  {/* Research Sections */}
-                  {researchSections.length > 0 && (
-                    <div className="space-y-4 mt-8">
-                      <h2 className="text-2xl font-bold gradient-text">Research Results</h2>
-                      {researchSections.map((section, index) => (
-                        <motion.div
-                          key={section.id}
-                          initial={{ opacity: 0, y: 20 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          transition={{ delay: index * 0.1 }}
-                          className="glass-card rounded-2xl overflow-hidden"
-                        >
-                          <button
-                            onClick={() => {
-                              setResearchSections(prev => prev.map(s => 
-                                s.id === section.id ? { ...s, isExpanded: !s.isExpanded } : s
-                              ));
-                            }}
-                            className="w-full p-5 flex items-center justify-between hover:bg-white/5 transition-colors"
+                    <div key={message.id} className="space-y-4">
+                      {/* User/Assistant Message */}
+                      <motion.div
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
+                      >
+                        <div className={`max-w-[80%] ${message.role === 'user' ? '' : ''}`}>
+                          <div
+                            className={`px-5 py-4 rounded-2xl ${
+                              message.role === 'user' 
+                                ? 'gradient-bg text-white ml-auto' 
+                                : 'glass-card'
+                            }`}
                           >
-                            <div className="flex items-center gap-3">
-                              {getSectionIcon(section.icon)}
-                              <h3 className="text-lg font-bold" style={{ color: 'var(--color-foreground)' }}>
-                                {section.title}
-                              </h3>
-                              {section.version && (
-                                <span className="text-xs px-2 py-0.5 rounded-full bg-white/10">
-                                  v{section.version}
-                                </span>
-                              )}
-                            </div>
-                            <div className="flex items-center gap-2">
-                              <button 
-                                onClick={(e) => { e.stopPropagation(); setShowCreateTaskModal(true); }}
-                                className="p-1.5 rounded hover:bg-white/10 transition-colors"
-                                title="Create Task"
+                            <p className="text-sm leading-relaxed">{message.content}</p>
+                          </div>
+                          <span className={`text-xs mt-1 block ${message.role === 'user' ? 'text-right' : ''}`} style={{ color: 'var(--color-secondary-text)' }}>
+                            {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                          </span>
+                        </div>
+                      </motion.div>
+
+                      {/* Research Sections for this message */}
+                      {message.sections && message.sections.length > 0 && (
+                        <div className="space-y-4 mt-4">
+                          <h2 className="text-2xl font-bold gradient-text">Research Results</h2>
+                          {message.sections.map((section, index) => (
+                            <motion.div
+                              key={section.id}
+                              initial={{ opacity: 0, y: 20 }}
+                              animate={{ opacity: 1, y: 0 }}
+                              transition={{ delay: index * 0.1 }}
+                              className="glass-card rounded-2xl overflow-hidden"
+                            >
+                              <button
+                                onClick={() => {
+                                  setMessages(prev => prev.map(m => 
+                                    m.id === message.id 
+                                      ? { 
+                                          ...m, 
+                                          sections: m.sections?.map(s => 
+                                            s.id === section.id ? { ...s, isExpanded: !s.isExpanded } : s
+                                          ) 
+                                        } 
+                                      : m
+                                  ));
+                                }}
+                                className="w-full p-5 flex items-center justify-between hover:bg-white/5 transition-colors"
                               >
-                                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-                                </svg>
-                              </button>
-                              <button 
-                                onClick={(e) => { e.stopPropagation(); setShowKBModal(true); }}
-                                className="p-1.5 rounded hover:bg-white/10 transition-colors"
-                                title="Add to KB"
-                              >
-                                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-                                </svg>
-                              </button>
-                              <svg 
-                                className={`w-5 h-5 transition-transform ${section.isExpanded !== false ? 'rotate-180' : ''}`} 
-                                fill="none" 
-                                viewBox="0 0 24 24" 
-                                stroke="currentColor"
-                              >
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                              </svg>
-                            </div>
-                          </button>
-                          <AnimatePresence>
-                            {section.isExpanded !== false && (
-                              <motion.div
-                                initial={{ height: 0, opacity: 0 }}
-                                animate={{ height: 'auto', opacity: 1 }}
-                                exit={{ height: 0, opacity: 0 }}
-                                className="overflow-hidden"
-                              >
-                                <div className="px-5 pb-5 pt-0">
-                                  <p className="text-sm leading-relaxed" style={{ color: 'var(--color-secondary-text)' }}>
-                                    {section.content}
-                                  </p>
+                                <div className="flex items-center gap-3">
+                                  {getSectionIcon(section.icon)}
+                                  <h3 className="text-lg font-bold" style={{ color: 'var(--color-foreground)' }}>
+                                    {section.title}
+                                  </h3>
+                                  {section.version && (
+                                    <span className="text-xs px-2 py-0.5 rounded-full bg-white/10">
+                                      v{section.version}
+                                    </span>
+                                  )}
                                 </div>
-                              </motion.div>
-                            )}
-                          </AnimatePresence>
-                        </motion.div>
-                      ))}
+                                <div className="flex items-center gap-2">
+                                  <button 
+                                    onClick={(e) => { e.stopPropagation(); setShowCreateTaskModal(true); }}
+                                    className="p-1.5 rounded hover:bg-white/10 transition-colors"
+                                    title="Create Task"
+                                  >
+                                    <PlusIcon className="w-4 h-4" />
+                                  </button>
+                                  <button 
+                                    onClick={(e) => { e.stopPropagation(); setShowKBModal(true); }}
+                                    className="p-1.5 rounded hover:bg-white/10 transition-colors"
+                                    title="Add to KB"
+                                  >
+                                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                                    </svg>
+                                  </button>
+                                  <svg 
+                                    className={`w-5 h-5 transition-transform ${section.isExpanded !== false ? 'rotate-180' : ''}`} 
+                                    fill="none" 
+                                    viewBox="0 0 24 24" 
+                                    stroke="currentColor"
+                                  >
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                                  </svg>
+                                </div>
+                              </button>
+                              <AnimatePresence>
+                                {section.isExpanded !== false && (
+                                  <motion.div
+                                    initial={{ height: 0, opacity: 0 }}
+                                    animate={{ height: 'auto', opacity: 1 }}
+                                    exit={{ height: 0, opacity: 0 }}
+                                    className="overflow-hidden"
+                                  >
+                                    <div className="px-5 pb-5 pt-0">
+                                      <p className="text-sm leading-relaxed" style={{ color: 'var(--color-secondary-text)' }}>
+                                        {section.content}
+                                      </p>
+                                    </div>
+                                  </motion.div>
+                                )}
+                              </AnimatePresence>
+                            </motion.div>
+                          ))}
+                        </div>
+                      )}
                     </div>
-                  )}
+                  ))}
                   <div ref={messagesEndRef} />
                 </div>
               )}
@@ -987,7 +1055,7 @@ export default function ProjectPage() {
             >
               {/* Tab Navigation */}
               <div className="flex border-b border-[var(--color-border)]">
-                {(['tasks', 'versions', 'activity', 'more'] as const).map((tab) => (
+                {([] as const).map((tab) => (
                   <button
                     key={tab}
                     onClick={() => setSidePanelTab(tab)}

@@ -6,6 +6,8 @@ import Navbar from '@/components/common/Navbar';
 import SearchBar from './components/SearchBar';
 import CreateWorkspaceModal from './components/CreateWorkspaceModal';
 import DeleteConfirmationModal from './components/DeleteConfirmationModal';
+import ApplicationSelectionModal, { ApplicationSelection } from './components/ApplicationSelectionModal';
+import RedirectingModal from './components/RedirectingModal';
 import toast from 'react-hot-toast';
 
 export interface Workspace {
@@ -50,6 +52,9 @@ export default function HomePage() {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [deleteWorkspace, setDeleteWorkspace] = useState<Workspace | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
+  const [isAppSelectionModalOpen, setIsAppSelectionModalOpen] = useState(false);
+  const [appSelectionAction, setAppSelectionAction] = useState<'search-kb' | 'initiate-change'>('search-kb');
+  const [isRedirectingModalOpen, setIsRedirectingModalOpen] = useState(false);
 
   useEffect(() => {
     // Intersection Observer for reveal animations
@@ -101,13 +106,43 @@ export default function HomePage() {
   };
 
   const handleSearch = (query: string) => {
-    setSearchQuery(query);
-    // Implement search logic here
-    console.log('Searching for:', query);
+    if (!query.trim()) return;
+    
+    // Generate a unique project ID and navigate directly to the project page
+    const projectId = Date.now().toString();
+    const params = new URLSearchParams({
+      query: query.trim(),
+    });
+    router.push(`/project/${projectId}?${params.toString()}`);
   };
 
   const handleWorkspaceSelect = (workspaceId: string) => {
     router.push(`/workspace/${workspaceId}`);
+  };
+
+  const handleQuickAction = (action: 'search-kb' | 'initiate-change' | 'create-workspace') => {
+    if (action === 'create-workspace') {
+      // Navigate directly to project page
+      const projectId = Date.now().toString();
+      router.push(`/project/${projectId}`);
+    } else {
+      // Show application selection modal for search-kb and initiate-change
+      setAppSelectionAction(action);
+      setIsAppSelectionModalOpen(true);
+    }
+  };
+
+  const handleAppSelectionProceed = (selection: ApplicationSelection) => {
+    setIsAppSelectionModalOpen(false);
+    
+    // Show redirecting modal (no actual redirect)
+    setIsRedirectingModalOpen(true);
+  };
+
+  const handleRedirectComplete = () => {
+    // Just close the modal and stay on the homepage
+    setIsRedirectingModalOpen(false);
+    toast.success('Process completed successfully!');
   };
 
   return (
@@ -141,6 +176,7 @@ export default function HomePage() {
             onSearch={handleSearch}
             workspaces={workspaces}
             onWorkspaceSelect={handleWorkspaceSelect}
+            onQuickAction={handleQuickAction}
           />
 
           <motion.div
@@ -149,14 +185,14 @@ export default function HomePage() {
             transition={{ duration: 0.6, delay: 0.8, ease: 'easeOut' }}
             className="mt-6"
           >
-            <motion.button
+            {/* <motion.button
               onClick={() => setIsCreateModalOpen(true)}
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               className="px-8 py-3 rounded-xl font-medium text-white gradient-bg hover-glow"
             >
               Create Workspace
-            </motion.button>
+            </motion.button> */}
           </motion.div>
         </div>
       </section>
@@ -276,6 +312,19 @@ export default function HomePage() {
         workspace={deleteWorkspace}
         onClose={() => setDeleteWorkspace(null)}
         onConfirm={confirmDelete}
+      />
+
+      <ApplicationSelectionModal
+        isOpen={isAppSelectionModalOpen}
+        onClose={() => setIsAppSelectionModalOpen(false)}
+        onProceed={handleAppSelectionProceed}
+        title={appSelectionAction === 'search-kb' ? 'Search Knowledge Base' : 'Initiate Change'}
+      />
+
+      <RedirectingModal
+        isOpen={isRedirectingModalOpen}
+        onComplete={handleRedirectComplete}
+        destination="Req-Ease"
       />
     </div>
   );
