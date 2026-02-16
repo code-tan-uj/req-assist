@@ -643,6 +643,13 @@ export default function ProjectPage() {
               </svg>
             </button>
             <button
+              onClick={() => setShowExportModal(true)}
+              className="p-2 rounded-lg hover:bg-white/10 transition-colors"
+              title="Download / Export"
+            >
+              <ArrowDownTrayIcon className="w-5 h-5" />
+            </button>
+            <button
               onClick={() => setShowSidePanel(!showSidePanel)}
               className={`p-2 rounded-lg transition-colors ${showSidePanel ? 'bg-white/20' : 'hover:bg-white/10'}`}
               title="Toggle Side Panel"
@@ -1280,6 +1287,11 @@ export default function ProjectPage() {
         onClose={() => setShowShareModal(false)}
       />
 
+      <ExportModal
+        isOpen={showExportModal}
+        onClose={() => setShowExportModal(false)}
+      />
+
       {/* Command Palette - Rendered at root level for proper z-index stacking */}
       <AnimatePresence>
         {showCommandPalette && (
@@ -1552,12 +1564,76 @@ function CreateTaskModal({
   onSave: (task: Omit<Task, 'id'>) => void;
   sections: ResearchSection[];
 }) {
+  // Tab state
+  const [activeTab, setActiveTab] = useState<'create-task' | 'kb-search'>('create-task');
+  
+  // Create Task form state
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [priority, setPriority] = useState<'high' | 'medium' | 'low'>('medium');
   const [assignee, setAssignee] = useState('');
   const [deadline, setDeadline] = useState('');
   const [linkedSection, setLinkedSection] = useState('');
+
+  // KB Search form state
+  const [applicationName, setApplicationName] = useState('');
+  const [categoryDomain, setCategoryDomain] = useState('');
+  const [moduleSubDomain, setModuleSubDomain] = useState('');
+  const [functionalComponent, setFunctionalComponent] = useState('');
+  const [showAppDropdown, setShowAppDropdown] = useState(false);
+  const [showCategoryDropdown, setShowCategoryDropdown] = useState(false);
+  const [showModuleDropdown, setShowModuleDropdown] = useState(false);
+  const [showComponentDropdown, setShowComponentDropdown] = useState(false);
+
+  // KB Search dropdown options
+  const APPLICATIONS = [
+    'Core Banking System',
+    'Payment Gateway',
+    'Customer Portal',
+    'Mobile Banking App',
+    'Risk Management Platform',
+    'Loan Origination System',
+  ];
+
+  const CATEGORIES = [
+    'Banking',
+    'Insurance',
+    'Payments',
+    'Investment',
+    'Lending',
+    'Risk & Compliance',
+  ];
+
+  const MODULES = [
+    'Account Management',
+    'Transaction Processing',
+    'User Authentication',
+    'Reporting & Analytics',
+    'Notification Services',
+    'Integration Layer',
+  ];
+
+  const COMPONENTS = [
+    'Login Module',
+    'Dashboard',
+    'User Profile',
+    'Transaction History',
+    'Settings Panel',
+    'Search Functionality',
+  ];
+
+  const filteredApps = APPLICATIONS.filter((app) =>
+    app.toLowerCase().includes(applicationName.toLowerCase())
+  );
+  const filteredCategories = CATEGORIES.filter((cat) =>
+    cat.toLowerCase().includes(categoryDomain.toLowerCase())
+  );
+  const filteredModules = MODULES.filter((mod) =>
+    mod.toLowerCase().includes(moduleSubDomain.toLowerCase())
+  );
+  const filteredComponents = COMPONENTS.filter((comp) =>
+    comp.toLowerCase().includes(functionalComponent.toLowerCase())
+  );
 
   const handleSubmit = () => {
     if (title.trim()) {
@@ -1581,6 +1657,430 @@ function CreateTaskModal({
     }
   };
 
+  const handleKBSearch = () => {
+    if (applicationName.trim()) {
+      // Handle KB search action
+      console.log('KB Search:', { applicationName, categoryDomain, moduleSubDomain, functionalComponent });
+      // Reset and close
+      setApplicationName('');
+      setCategoryDomain('');
+      setModuleSubDomain('');
+      setFunctionalComponent('');
+      onClose();
+    }
+  };
+
+  const resetForm = () => {
+    // Reset Create Task
+    setTitle('');
+    setDescription('');
+    setPriority('medium');
+    setAssignee('');
+    setDeadline('');
+    setLinkedSection('');
+    // Reset KB Search
+    setApplicationName('');
+    setCategoryDomain('');
+    setModuleSubDomain('');
+    setFunctionalComponent('');
+  };
+
+  const handleClose = () => {
+    resetForm();
+    onClose();
+  };
+
+  if (!isOpen) return null;
+
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 backdrop-blur-sm bg-black/50"
+      onClick={handleClose}
+    >
+      <motion.div
+        initial={{ scale: 0.9, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        exit={{ scale: 0.9, opacity: 0 }}
+        className="w-full max-w-lg rounded-2xl overflow-hidden"
+        style={{ 
+          background: '#ffffff',
+          boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)'
+        }}
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Header with Close Button */}
+        <div className="flex items-center justify-end p-4 pb-0">
+          <button onClick={handleClose} className="p-1 rounded-lg hover:bg-gray-100 transition-colors">
+            <svg className="w-6 h-6 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+
+        {/* Tab Navigation */}
+        <div className="flex border-b border-gray-200 px-6">
+          <button
+            onClick={() => setActiveTab('create-task')}
+            className={`flex-1 py-3 text-sm font-semibold transition-colors relative ${
+              activeTab === 'create-task' 
+                ? 'text-purple-600' 
+                : 'text-gray-500 hover:text-gray-700'
+            }`}
+          >
+            Create Task
+            {activeTab === 'create-task' && (
+              <motion.div
+                layoutId="activeModalTab"
+                className="absolute bottom-0 left-0 right-0 h-0.5 bg-purple-600"
+              />
+            )}
+          </button>
+          <button
+            onClick={() => setActiveTab('kb-search')}
+            className={`flex-1 py-3 text-sm font-semibold transition-colors relative ${
+              activeTab === 'kb-search' 
+                ? 'text-purple-600' 
+                : 'text-gray-500 hover:text-gray-700'
+            }`}
+          >
+            KB Search
+            {activeTab === 'kb-search' && (
+              <motion.div
+                layoutId="activeModalTab"
+                className="absolute bottom-0 left-0 right-0 h-0.5 bg-purple-600"
+              />
+            )}
+          </button>
+        </div>
+
+        {/* Tab Content */}
+        <div className="p-6">
+          <AnimatePresence mode="wait">
+            {activeTab === 'create-task' ? (
+              <motion.div
+                key="create-task"
+                initial={{ opacity: 0, x: -10 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: 10 }}
+                transition={{ duration: 0.15 }}
+                className="space-y-4"
+              >
+                <div>
+                  <label className="block text-sm font-semibold mb-2 text-gray-800">Title*</label>
+                  <input
+                    type="text"
+                    value={title}
+                    onChange={(e) => setTitle(e.target.value)}
+                    placeholder="Enter task title..."
+                    className="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 text-gray-800 placeholder-gray-400 focus:border-purple-300 focus:ring-2 focus:ring-purple-100 outline-none transition-all"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-semibold mb-2 text-gray-800">Description</label>
+                  <textarea
+                    value={description}
+                    onChange={(e) => setDescription(e.target.value)}
+                    placeholder="Task description..."
+                    rows={2}
+                    className="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 text-gray-800 placeholder-gray-400 focus:border-purple-300 focus:ring-2 focus:ring-purple-100 outline-none transition-all resize-none"
+                  />
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-sm font-semibold mb-2 text-gray-800">Assign to</label>
+                    <select
+                      value={assignee}
+                      onChange={(e) => setAssignee(e.target.value)}
+                      className="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 text-gray-800 focus:border-purple-300 focus:ring-2 focus:ring-purple-100 outline-none transition-all"
+                    >
+                      <option value="">Select assignee</option>
+                      <option value="Alice">Alice</option>
+                      <option value="Bob">Bob</option>
+                      <option value="Carol">Carol</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-semibold mb-2 text-gray-800">Deadline</label>
+                    <input
+                      type="date"
+                      value={deadline}
+                      onChange={(e) => setDeadline(e.target.value)}
+                      className="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 text-gray-800 focus:border-purple-300 focus:ring-2 focus:ring-purple-100 outline-none transition-all"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-semibold mb-2 text-gray-800">Priority</label>
+                  <div className="flex gap-3">
+                    {(['high', 'medium', 'low'] as const).map((p) => (
+                      <button
+                        key={p}
+                        onClick={() => setPriority(p)}
+                        className={`flex-1 py-2 rounded-lg text-sm font-medium transition-all capitalize ${
+                          priority === p
+                            ? p === 'high' ? 'bg-red-100 text-red-600 border-2 border-red-300'
+                              : p === 'medium' ? 'bg-orange-100 text-orange-600 border-2 border-orange-300'
+                              : 'bg-green-100 text-green-600 border-2 border-green-300'
+                            : 'bg-gray-50 border border-gray-200 text-gray-600 hover:bg-gray-100'
+                        }`}
+                      >
+                        {p}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {sections.length > 0 && (
+                  <div>
+                    <label className="block text-sm font-semibold mb-2 text-gray-800">Linked Section</label>
+                    <select
+                      value={linkedSection}
+                      onChange={(e) => setLinkedSection(e.target.value)}
+                      className="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 text-gray-800 focus:border-purple-300 focus:ring-2 focus:ring-purple-100 outline-none transition-all"
+                    >
+                      <option value="">Select section</option>
+                      {sections.map((s) => (
+                        <option key={s.id} value={s.title}>{s.title}</option>
+                      ))}
+                    </select>
+                  </div>
+                )}
+
+                <div className="flex gap-3 pt-2">
+                  <button
+                    onClick={handleClose}
+                    className="flex-1 px-6 py-3 rounded-xl font-medium bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={handleSubmit}
+                    disabled={!title.trim()}
+                    className="flex-1 px-6 py-3 rounded-xl font-medium text-white disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                    style={{ background: 'linear-gradient(135deg, #9d7cc4 0%, #c4a0e8 50%, #e8c4f0 100%)' }}
+                  >
+                    Create Task
+                  </button>
+                </div>
+              </motion.div>
+            ) : (
+              <motion.div
+                key="kb-search"
+                initial={{ opacity: 0, x: 10 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -10 }}
+                transition={{ duration: 0.15 }}
+                className="space-y-4"
+              >
+                {/* Application Name - Required */}
+                <div className="relative">
+                  <label className="block text-sm font-semibold mb-2 text-gray-800">
+                    Application Name <span className="text-red-500">*</span>
+                  </label>
+                  <div className="relative">
+                    <input
+                      type="text"
+                      value={applicationName}
+                      onChange={(e) => setApplicationName(e.target.value)}
+                      onFocus={() => setShowAppDropdown(true)}
+                      onBlur={() => setTimeout(() => setShowAppDropdown(false), 200)}
+                      placeholder="Search Application Name"
+                      className="w-full px-4 py-3 pr-10 rounded-xl bg-gray-50 border border-gray-200 text-gray-800 placeholder-gray-400 focus:border-purple-300 focus:ring-2 focus:ring-purple-100 outline-none transition-all"
+                    />
+                    <MagnifyingGlassIcon className="w-5 h-5 absolute right-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                  </div>
+                  {showAppDropdown && filteredApps.length > 0 && (
+                    <div className="absolute top-full left-0 right-0 mt-1 rounded-xl border border-gray-200 shadow-lg z-10 max-h-40 overflow-y-auto bg-white">
+                      {filteredApps.map((app) => (
+                        <button
+                          key={app}
+                          onMouseDown={() => {
+                            setApplicationName(app);
+                            setShowAppDropdown(false);
+                          }}
+                          className="w-full px-4 py-2 text-left hover:bg-gray-100 transition-colors text-sm text-gray-800"
+                        >
+                          {app}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                {/* Category/Domain */}
+                <div className="relative">
+                  <label className="block text-sm font-semibold mb-2 text-gray-800">
+                    Category/Domain
+                  </label>
+                  <div className="relative">
+                    <input
+                      type="text"
+                      value={categoryDomain}
+                      onChange={(e) => setCategoryDomain(e.target.value)}
+                      onFocus={() => setShowCategoryDropdown(true)}
+                      onBlur={() => setTimeout(() => setShowCategoryDropdown(false), 200)}
+                      placeholder="Search Category/Domain"
+                      className="w-full px-4 py-3 pr-10 rounded-xl bg-gray-50 border border-gray-200 text-gray-800 placeholder-gray-400 focus:border-purple-300 focus:ring-2 focus:ring-purple-100 outline-none transition-all"
+                    />
+                    <MagnifyingGlassIcon className="w-5 h-5 absolute right-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                  </div>
+                  {showCategoryDropdown && filteredCategories.length > 0 && (
+                    <div className="absolute top-full left-0 right-0 mt-1 rounded-xl border border-gray-200 shadow-lg z-10 max-h-40 overflow-y-auto bg-white">
+                      {filteredCategories.map((cat) => (
+                        <button
+                          key={cat}
+                          onMouseDown={() => {
+                            setCategoryDomain(cat);
+                            setShowCategoryDropdown(false);
+                          }}
+                          className="w-full px-4 py-2 text-left hover:bg-gray-100 transition-colors text-sm text-gray-800"
+                        >
+                          {cat}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                {/* Module/Sub-domain */}
+                <div className="relative">
+                  <label className="block text-sm font-semibold mb-2 text-gray-800">
+                    Module/Sub-domain
+                  </label>
+                  <div className="relative">
+                    <input
+                      type="text"
+                      value={moduleSubDomain}
+                      onChange={(e) => setModuleSubDomain(e.target.value)}
+                      onFocus={() => setShowModuleDropdown(true)}
+                      onBlur={() => setTimeout(() => setShowModuleDropdown(false), 200)}
+                      placeholder="Search Module/Sub-domain"
+                      className="w-full px-4 py-3 pr-10 rounded-xl bg-gray-50 border border-gray-200 text-gray-800 placeholder-gray-400 focus:border-purple-300 focus:ring-2 focus:ring-purple-100 outline-none transition-all"
+                    />
+                    <MagnifyingGlassIcon className="w-5 h-5 absolute right-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                  </div>
+                  {showModuleDropdown && filteredModules.length > 0 && (
+                    <div className="absolute top-full left-0 right-0 mt-1 rounded-xl border border-gray-200 shadow-lg z-10 max-h-40 overflow-y-auto bg-white">
+                      {filteredModules.map((mod) => (
+                        <button
+                          key={mod}
+                          onMouseDown={() => {
+                            setModuleSubDomain(mod);
+                            setShowModuleDropdown(false);
+                          }}
+                          className="w-full px-4 py-2 text-left hover:bg-gray-100 transition-colors text-sm text-gray-800"
+                        >
+                          {mod}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                {/* Functional Component */}
+                <div className="relative">
+                  <label className="block text-sm font-semibold mb-2 text-gray-800">
+                    Functional Component
+                  </label>
+                  <div className="relative">
+                    <input
+                      type="text"
+                      value={functionalComponent}
+                      onChange={(e) => setFunctionalComponent(e.target.value)}
+                      onFocus={() => setShowComponentDropdown(true)}
+                      onBlur={() => setTimeout(() => setShowComponentDropdown(false), 200)}
+                      placeholder="Search Functional Component"
+                      className="w-full px-4 py-3 pr-10 rounded-xl bg-gray-50 border border-gray-200 text-gray-800 placeholder-gray-400 focus:border-purple-300 focus:ring-2 focus:ring-purple-100 outline-none transition-all"
+                    />
+                    <MagnifyingGlassIcon className="w-5 h-5 absolute right-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                  </div>
+                  {showComponentDropdown && filteredComponents.length > 0 && (
+                    <div className="absolute top-full left-0 right-0 mt-1 rounded-xl border border-gray-200 shadow-lg z-10 max-h-40 overflow-y-auto bg-white">
+                      {filteredComponents.map((comp) => (
+                        <button
+                          key={comp}
+                          onMouseDown={() => {
+                            setFunctionalComponent(comp);
+                            setShowComponentDropdown(false);
+                          }}
+                          className="w-full px-4 py-2 text-left hover:bg-gray-100 transition-colors text-sm text-gray-800"
+                        >
+                          {comp}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                <div className="flex gap-3 pt-2">
+                  <button
+                    onClick={handleClose}
+                    className="flex-1 px-6 py-3 rounded-xl font-medium bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    onClick={handleKBSearch}
+                    disabled={!applicationName.trim()}
+                    className="flex-1 px-6 py-3 rounded-xl font-medium text-white disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                    style={{ background: 'linear-gradient(135deg, #9d7cc4 0%, #c4a0e8 50%, #e8c4f0 100%)' }}
+                  >
+                    Search KB
+                  </button>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+      </motion.div>
+    </div>
+  );
+}
+
+// Export Modal Component
+function ExportModal({
+  isOpen,
+  onClose,
+}: {
+  isOpen: boolean;
+  onClose: () => void;
+}) {
+  const [selectedFormat, setSelectedFormat] = useState<'pdf' | 'docx' | 'md' | 'json'>('pdf');
+  const [selectedContent, setSelectedContent] = useState<string[]>(['research', 'tasks', 'versions']);
+  const [isExporting, setIsExporting] = useState(false);
+
+  const formats = [
+    { id: 'pdf', name: 'PDF Document', icon: '📄', description: 'Best for sharing and printing' },
+    { id: 'docx', name: 'Word Document', icon: '📝', description: 'Editable document format' },
+    { id: 'md', name: 'Markdown', icon: '📋', description: 'Plain text with formatting' },
+    { id: 'json', name: 'JSON Data', icon: '🔧', description: 'Raw data export' },
+  ];
+
+  const contentOptions = [
+    { id: 'research', name: 'Research Results', description: 'All research sections and findings' },
+    { id: 'tasks', name: 'Tasks', description: 'Task list and progress' },
+    { id: 'versions', name: 'Version History', description: 'All saved versions' },
+    { id: 'chat', name: 'Chat History', description: 'Full conversation log' },
+    { id: 'sources', name: 'Sources & Citations', description: 'Referenced materials' },
+  ];
+
+  const toggleContent = (contentId: string) => {
+    setSelectedContent(prev =>
+      prev.includes(contentId) ? prev.filter(id => id !== contentId) : [...prev, contentId]
+    );
+  };
+
+  const handleExport = async () => {
+    setIsExporting(true);
+    // Simulate export process
+    await new Promise(resolve => setTimeout(resolve, 1500));
+    setIsExporting(false);
+    onClose();
+  };
+
   if (!isOpen) return null;
 
   return (
@@ -1602,7 +2102,7 @@ function CreateTaskModal({
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between mb-6">
-          <h2 className="text-xl font-bold gradient-text">Create Task</h2>
+          <h2 className="text-xl font-bold gradient-text">Export Research</h2>
           <button onClick={onClose} className="p-2 rounded-lg hover:bg-gray-100 transition-colors">
             <svg className="w-5 h-5" style={{ color: '#6B6B85' }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -1610,120 +2110,66 @@ function CreateTaskModal({
           </button>
         </div>
 
-        <div className="space-y-4">
+        <div className="space-y-5">
+          {/* File Format Selection */}
           <div>
-            <label className="block text-sm font-medium mb-2" style={{ color: '#2D2D44' }}>Title*</label>
-            <input
-              type="text"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              placeholder="Enter task title..."
-              className="w-full px-4 py-3 rounded-xl focus:ring-2 focus:ring-purple-400 focus:border-transparent"
-              style={{ 
-                color: '#2D2D44',
-                background: 'rgba(255, 255, 255, 0.8)',
-                border: '1px solid rgba(0, 0, 0, 0.1)'
-              }}
-            />
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium mb-2" style={{ color: '#2D2D44' }}>Description</label>
-            <textarea
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              placeholder="Task description..."
-              rows={3}
-              className="w-full px-4 py-3 rounded-xl focus:ring-2 focus:ring-purple-400 focus:border-transparent resize-none"
-              style={{ 
-                color: '#2D2D44',
-                background: 'rgba(255, 255, 255, 0.8)',
-                border: '1px solid rgba(0, 0, 0, 0.1)'
-              }}
-            />
-          </div>
-
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium mb-2" style={{ color: '#2D2D44' }}>Assign to</label>
-              <select
-                value={assignee}
-                onChange={(e) => setAssignee(e.target.value)}
-                className="w-full px-4 py-3 rounded-xl focus:ring-2 focus:ring-purple-400 focus:border-transparent"
-                style={{ 
-                  color: '#2D2D44',
-                  background: 'rgba(255, 255, 255, 0.8)',
-                  border: '1px solid rgba(0, 0, 0, 0.1)'
-                }}
-              >
-                <option value="">Select assignee</option>
-                <option value="Alice">Alice</option>
-                <option value="Bob">Bob</option>
-                <option value="Carol">Carol</option>
-              </select>
-            </div>
-            <div>
-              <label className="block text-sm font-medium mb-2" style={{ color: '#2D2D44' }}>Deadline</label>
-              <input
-                type="date"
-                value={deadline}
-                onChange={(e) => setDeadline(e.target.value)}
-                className="w-full px-4 py-3 rounded-xl focus:ring-2 focus:ring-purple-400 focus:border-transparent"
-                style={{ 
-                  color: '#2D2D44',
-                  background: 'rgba(255, 255, 255, 0.8)',
-                  border: '1px solid rgba(0, 0, 0, 0.1)'
-                }}
-              />
-            </div>
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium mb-2" style={{ color: '#2D2D44' }}>Priority</label>
-            <div className="flex gap-3">
-              {(['high', 'medium', 'low'] as const).map((p) => (
+            <label className="block text-sm font-medium mb-3" style={{ color: '#2D2D44' }}>Export Format</label>
+            <div className="grid grid-cols-2 gap-2">
+              {formats.map((format) => (
                 <button
-                  key={p}
-                  onClick={() => setPriority(p)}
-                  className={`flex-1 py-2 rounded-lg text-sm font-medium transition-colors capitalize ${
-                    priority === p
-                      ? p === 'high' ? 'bg-red-500/30 text-red-600 border border-red-500/50'
-                        : p === 'medium' ? 'bg-orange-500/30 text-orange-600 border border-orange-500/50'
-                        : 'bg-green-500/30 text-green-600 border border-green-500/50'
-                      : 'hover:bg-gray-100'
+                  key={format.id}
+                  onClick={() => setSelectedFormat(format.id as any)}
+                  className={`flex items-center gap-3 p-3 rounded-xl transition-all ${
+                    selectedFormat === format.id ? 'ring-2 ring-purple-500' : ''
                   }`}
-                  style={priority !== p ? { 
-                    background: 'rgba(255, 255, 255, 0.8)',
-                    border: '1px solid rgba(0, 0, 0, 0.1)',
-                    color: '#2D2D44'
-                  } : {}}
+                  style={{
+                    background: selectedFormat === format.id ? 'rgba(147, 51, 234, 0.1)' : 'rgba(255, 255, 255, 0.8)',
+                    border: '1px solid rgba(0, 0, 0, 0.1)'
+                  }}
                 >
-                  {p}
+                  <span className="text-2xl">{format.icon}</span>
+                  <div className="text-left">
+                    <p className="text-sm font-medium" style={{ color: '#2D2D44' }}>{format.name}</p>
+                    <p className="text-xs" style={{ color: '#6B6B85' }}>{format.description}</p>
+                  </div>
                 </button>
               ))}
             </div>
           </div>
 
-          {sections.length > 0 && (
-            <div>
-              <label className="block text-sm font-medium mb-2" style={{ color: '#2D2D44' }}>Linked Section</label>
-              <select
-                value={linkedSection}
-                onChange={(e) => setLinkedSection(e.target.value)}
-                className="w-full px-4 py-3 rounded-xl focus:ring-2 focus:ring-purple-400 focus:border-transparent"
-                style={{ 
-                  color: '#2D2D44',
-                  background: 'rgba(255, 255, 255, 0.8)',
-                  border: '1px solid rgba(0, 0, 0, 0.1)'
-                }}
-              >
-                <option value="">Select section</option>
-                {sections.map((s) => (
-                  <option key={s.id} value={s.title}>{s.title}</option>
-                ))}
-              </select>
+          {/* Content Selection */}
+          <div>
+            <label className="block text-sm font-medium mb-3" style={{ color: '#2D2D44' }}>Content to Export</label>
+            <div className="space-y-2">
+              {contentOptions.map((option) => (
+                <button
+                  key={option.id}
+                  onClick={() => toggleContent(option.id)}
+                  className={`w-full flex items-center gap-3 p-3 rounded-xl transition-colors ${
+                    selectedContent.includes(option.id) ? 'bg-purple-100' : 'hover:bg-gray-100'
+                  }`}
+                  style={{
+                    background: selectedContent.includes(option.id) ? 'rgba(147, 51, 234, 0.1)' : 'rgba(255, 255, 255, 0.8)',
+                    border: '1px solid rgba(0, 0, 0, 0.1)'
+                  }}
+                >
+                  <div className={`w-5 h-5 rounded border-2 flex items-center justify-center ${
+                    selectedContent.includes(option.id) ? 'bg-[var(--color-primary)] border-[var(--color-primary)]' : 'border-gray-400'
+                  }`}>
+                    {selectedContent.includes(option.id) && (
+                      <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                      </svg>
+                    )}
+                  </div>
+                  <div className="text-left flex-1">
+                    <p className="text-sm font-medium" style={{ color: '#2D2D44' }}>{option.name}</p>
+                    <p className="text-xs" style={{ color: '#6B6B85' }}>{option.description}</p>
+                  </div>
+                </button>
+              ))}
             </div>
-          )}
+          </div>
         </div>
 
         <div className="flex gap-3 mt-6">
@@ -1739,11 +2185,24 @@ function CreateTaskModal({
             Cancel
           </button>
           <button
-            onClick={handleSubmit}
-            disabled={!title.trim()}
-            className="flex-1 px-6 py-3 rounded-xl font-medium text-white gradient-bg hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+            onClick={handleExport}
+            disabled={selectedContent.length === 0 || isExporting}
+            className="flex-1 px-6 py-3 rounded-xl font-medium text-white gradient-bg hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
           >
-            Create Task
+            {isExporting ? (
+              <>
+                <svg className="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                </svg>
+                Exporting...
+              </>
+            ) : (
+              <>
+                <ArrowDownTrayIcon className="w-4 h-4" />
+                Export
+              </>
+            )}
           </button>
         </div>
       </motion.div>
