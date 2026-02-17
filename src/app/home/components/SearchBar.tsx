@@ -28,9 +28,10 @@ interface SearchBarProps {
   workspaces: Workspace[];
   onWorkspaceSelect: (workspaceId: string) => void;
   onQuickAction: (action: 'search-kb' | 'initiate-change' | 'create-workspace') => void;
+  onOpenMyProjects?: () => void;
 }
 
-export default function SearchBar({ onSearch, workspaces, onWorkspaceSelect, onQuickAction }: SearchBarProps) {
+export default function SearchBar({ onSearch, workspaces, onWorkspaceSelect, onQuickAction, onOpenMyProjects }: SearchBarProps) {
   const [query, setQuery] = useState('');
   const [isFocused, setIsFocused] = useState(false);
   const [showWorkspacePalette, setShowWorkspacePalette] = useState(false);
@@ -317,6 +318,25 @@ export default function SearchBar({ onSearch, workspaces, onWorkspaceSelect, onQ
               </motion.button>
             );
           })}
+
+            {/* My Collections button - opens the My Collections modal */}
+            <motion.button
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4, delay: 0.95 }}
+              whileHover={{ scale: 1.05, y: -2 }}
+              whileTap={{ scale: 0.95 }}
+              onClick={() => onOpenMyProjects && onOpenMyProjects()}
+              className="px-4 py-2.5 rounded-xl flex items-center gap-2 transition-all shadow-md hover:shadow-lg"
+              style={{
+                backgroundColor: '#ffffff',
+                border: '1px solid #e5e7eb',
+                boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
+              }}
+            >
+              <FolderIcon className="w-4 h-4 text-gray-600" />
+              <span className="text-sm font-medium text-gray-800">My Collections</span>
+            </motion.button>
         </motion.div>
 
         {/* Hint Text */}

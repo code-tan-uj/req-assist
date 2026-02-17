@@ -36,14 +36,14 @@ const initialWorkspaces: Workspace[] = [
     tags: ['product', 'UX', 'research'],
     updatedAt: '1 day ago',
   },
-  {
-    id: '3',
-    name: 'Academic Studies',
-    description: 'Collection of research papers and academic resources for thesis work',
-    projectCount: 8,
-    tags: ['academic', 'thesis', 'papers'],
-    updatedAt: '3 days ago',
-  },
+  // {
+  //   id: '3',
+  //   name: 'Academic Studies',
+  //   description: 'Collection of research papers and academic resources for thesis work',
+  //   projectCount: 8,
+  //   tags: ['academic', 'thesis', 'papers'],
+  //   updatedAt: '3 days ago',
+  // },
 ];
 
 export default function HomePage() {
@@ -55,6 +55,7 @@ export default function HomePage() {
   const [isAppSelectionModalOpen, setIsAppSelectionModalOpen] = useState(false);
   const [appSelectionAction, setAppSelectionAction] = useState<'search-kb' | 'initiate-change'>('search-kb');
   const [isRedirectingModalOpen, setIsRedirectingModalOpen] = useState(false);
+  const [isMyProjectsModalOpen, setIsMyProjectsModalOpen] = useState(false);
 
   useEffect(() => {
     // Intersection Observer for reveal animations
@@ -71,7 +72,12 @@ export default function HomePage() {
     return () => observer.disconnect();
   }, []);
 
-  const handleCreateWorkspace = (workspace: Omit<Workspace, 'id' | 'updatedAt'>) => {
+  const handleCreateWorkspace = (workspace: {
+    name: string;
+    description: string;
+    projectCount: number;
+    tags: string[];
+  }) => {
     const newWorkspace: Workspace = {
       ...workspace,
       id: Date.now().toString(),
@@ -122,9 +128,8 @@ export default function HomePage() {
 
   const handleQuickAction = (action: 'search-kb' | 'initiate-change' | 'create-workspace') => {
     if (action === 'create-workspace') {
-      // Navigate directly to project page
-      const projectId = Date.now().toString();
-      router.push(`/project/${projectId}`);
+      // Open create workspace modal
+      setIsCreateModalOpen(true);
     } else {
       // Show application selection modal for search-kb and initiate-change
       setAppSelectionAction(action);
@@ -177,6 +182,7 @@ export default function HomePage() {
             workspaces={workspaces}
             onWorkspaceSelect={handleWorkspaceSelect}
             onQuickAction={handleQuickAction}
+            onOpenMyProjects={() => setIsMyProjectsModalOpen(true)}
           />
 
           <motion.div
@@ -326,6 +332,58 @@ export default function HomePage() {
         onComplete={handleRedirectComplete}
         destination="Req-Ease"
       />
+
+      {/* My Collections Modal */}
+      <MyProjectsModal
+        isOpen={isMyProjectsModalOpen}
+        onClose={() => setIsMyProjectsModalOpen(false)}
+        onSelect={(workspaceId: string) => {
+          // Navigate to the workspace page for the selected workspace
+          setIsMyProjectsModalOpen(false);
+          router.push(`/workspace/${workspaceId}`);
+        }}
+      />
+    </div>
+  );
+}
+
+function MyProjectsModal({ isOpen, onClose, onSelect }: { isOpen: boolean; onClose: () => void; onSelect: (id: string) => void; }) {
+  // Use workspace IDs that match `initialWorkspaces` in this file
+  const collections = [
+    { id: '1', title: 'Market Analysis 2026' },
+    { id: '2', title: 'Product Research' },
+    // { id: '3', title: 'Academic Studies' },
+  ];
+
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 backdrop-blur-sm bg-black/50" onClick={onClose}>
+      <motion.div initial={{ scale: 0.95, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.95, opacity: 0 }} className="w-full max-w-md rounded-2xl p-6" style={{ background: 'rgba(255,255,255,0.95)' }} onClick={(e) => e.stopPropagation()}>
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-lg font-bold">My Collections</h3>
+          <button onClick={onClose} className="p-2 rounded-lg hover:bg-gray-100 transition-colors">Close</button>
+        </div>
+
+        <div className="grid gap-3">
+          {collections.map((c) => (
+            <button key={c.id} onClick={() => onSelect(c.id)} className="w-full p-3 rounded-xl hover:bg-gray-100 transition-colors text-left">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="font-medium">{c.title}</p>
+                  <p className="text-xs text-[var(--color-secondary-text)]">Open the {c.title} collection</p>
+                </div>
+                <div className="text-sm text-[var(--color-secondary-text)]">›</div>
+              </div>
+            </button>
+          ))}
+
+          {/* <button onClick={() => onSelect('create-new')} className="w-full p-3 rounded-xl border-dashed border-2 border-gray-200 hover:bg-gray-50 flex items-center gap-3">
+            <span className="text-2xl">+</span>
+            <span className="font-medium">Create New Collection</span>
+          </button> */}
+        </div>
+      </motion.div>
     </div>
   );
 }

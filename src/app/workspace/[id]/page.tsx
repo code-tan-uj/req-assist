@@ -46,11 +46,11 @@ const mockWorkspaces: Record<string, { name: string; description?: string; proje
     description: 'User research and competitive analysis for new product features',
     projects: [],
   },
-  '3': {
-    name: 'Academic Studies',
-    description: 'Collection of research papers and academic resources for thesis work',
-    projects: [],
-  },
+  // '3': {
+  //   name: 'Academic Studies',
+  //   description: 'Collection of research papers and academic resources for thesis work',
+  //   projects: [],
+  // },
 };
 
 export default function WorkspacePage() {

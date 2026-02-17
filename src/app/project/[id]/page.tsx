@@ -1,6 +1,7 @@
 'use client';
-import { useState, useRef, useEffect, useCallback } from 'react';
+import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { useRouter, useParams, useSearchParams } from 'next/navigation';
+import { useKB } from '@/lib/kb-store';
 import { motion, AnimatePresence, Reorder } from 'framer-motion';
 import Navbar from '@/components/common/Navbar';
 import {
@@ -150,11 +151,9 @@ const SIDEBAR_MENU = [
     title: 'Market Research',
     icon: <ChartBarIcon className="w-5 h-5 text-primary" />,
     items: [
-      { id: 'competitor', label: 'Competitor Research', icon: <UserGroupIcon className="w-5 h-5 text-primary" /> },
-      { id: 'market-analysis', label: 'Market Analysis', icon: <ChartBarIcon className="w-5 h-5 text-primary" /> },
-      { id: 'gap-analysis', label: 'Gap Analysis', icon: <ChartBarIcon className="w-5 h-5 text-primary" /> },
-      { id: 'dark-patterns', label: 'Dark Patterns', icon: <ExclamationTriangleIcon className="w-5 h-5 text-primary" /> },
-      { id: 'barriers', label: 'Entry/Exit Barriers', icon: <ShieldCheckIcon className="w-5 h-5 text-primary" /> },
+      { id: 'market-analysis', label: 'Market Analysis', icon: <ChartBarIcon className="w-5 h-5 text-primary" />, onClick: undefined as (() => void) | undefined },
+      { id: 'gap-analysis', label: 'Gap Analysis', icon: <ChartBarIcon className="w-5 h-5 text-primary" />, onClick: undefined as (() => void) | undefined },
+      { id: 'dark-patterns', label: 'Dark Patterns', icon: <ExclamationTriangleIcon className="w-5 h-5 text-primary" />, onClick: undefined as (() => void) | undefined },
     ],
   },
   {
@@ -162,9 +161,8 @@ const SIDEBAR_MENU = [
     title: 'Knowledge Base',
     icon: <BookOpenIcon className="w-5 h-5 text-primary" />,
     items: [
-      { id: 'browse-kb', label: 'Browse KB Articles', icon: <MagnifyingGlassIcon className="w-5 h-5 text-primary" /> },
-      { id: 'add-kb', label: 'Add to KB', icon: <PlusIcon className="w-5 h-5 text-primary" /> },
-      { id: 'search-kb', label: 'Search KB', icon: <MagnifyingGlassIcon className="w-5 h-5 text-primary" /> },
+      { id: 'add-kb', label: 'Add to KB', icon: <PlusIcon className="w-5 h-5 text-primary" />, onClick: undefined as (() => void) | undefined },
+      { id: 'search-kb', label: 'Search KB', icon: <MagnifyingGlassIcon className="w-5 h-5 text-primary" />, onClick: undefined as (() => void) | undefined },
     ],
   },
   {
@@ -172,9 +170,9 @@ const SIDEBAR_MENU = [
     title: 'User Stories',
     icon: <ChartBarIcon className="w-5 h-5 text-primary" />,
     items: [
-      { id: 'create-us', label: 'Create User Story', icon: <PlusIcon className="w-5 h-5 text-primary" /> },
-      { id: 'auto-categorize', label: 'Auto-categorize', icon: <ArrowPathIcon className="w-5 h-5 text-primary" /> },
-      { id: 'view-board', label: 'View Azure Board', icon: <EyeIcon className="w-5 h-5 text-primary" /> },
+      { id: 'create-us', label: 'Create User Story', icon: <PlusIcon className="w-5 h-5 text-primary" />, onClick: undefined as (() => void) | undefined },
+      { id: 'auto-categorize', label: 'Auto-categorize', icon: <ArrowPathIcon className="w-5 h-5 text-primary" />, onClick: undefined as (() => void) | undefined },
+      { id: 'view-board', label: 'View Azure Board', icon: <EyeIcon className="w-5 h-5 text-primary" />, onClick: undefined as (() => void) | undefined },
     ],
   },
   {
@@ -182,9 +180,9 @@ const SIDEBAR_MENU = [
     title: 'Documents',
     icon: <DocumentIcon className="w-5 h-5 text-primary" />,
     items: [
-      { id: 'add-doc', label: 'Add Document', icon: <PlusIcon className="w-5 h-5 text-primary" /> },
-      { id: 'link-doc', label: 'Link Documents', icon: <LinkIcon className="w-5 h-5 text-primary" /> },
-      { id: 'export', label: 'Export Research', icon: <ArrowUpTrayIcon className="w-5 h-5 text-primary" /> },
+      { id: 'add-doc', label: 'Add Document', icon: <PlusIcon className="w-5 h-5 text-primary" />, onClick: undefined as (() => void) | undefined },
+      { id: 'link-doc', label: 'Link Documents', icon: <LinkIcon className="w-5 h-5 text-primary" />, onClick: undefined as (() => void) | undefined },
+      { id: 'export', label: 'Export Research', icon: <ArrowUpTrayIcon className="w-5 h-5 text-primary" />, onClick: undefined as (() => void) | undefined },
     ],
   },
   {
@@ -192,9 +190,9 @@ const SIDEBAR_MENU = [
     title: 'Integrations',
     icon: <CloudIcon className="w-5 h-5 text-primary" />,
     items: [
-      { id: 'github', label: 'GitHub Links', icon: <LinkIcon className="w-5 h-5 text-primary" /> },
-      { id: 'azure', label: 'Azure DevOps', icon: <CloudIcon className="w-5 h-5 text-primary" /> },
-      { id: 'confluence', label: 'Confluence', icon: <BookOpenIcon className="w-5 h-5 text-primary" /> },
+      { id: 'github', label: 'GitHub Links', icon: <LinkIcon className="w-5 h-5 text-primary" />, onClick: undefined as (() => void) | undefined },
+      { id: 'azure', label: 'Azure DevOps', icon: <CloudIcon className="w-5 h-5 text-primary" />, onClick: undefined as (() => void) | undefined },
+      { id: 'confluence', label: 'Confluence', icon: <BookOpenIcon className="w-5 h-5 text-primary" />, onClick: undefined as (() => void) | undefined },
     ],
   },
 ];
@@ -238,6 +236,7 @@ export default function ProjectPage() {
   const params = useParams();
   const searchParams = useSearchParams();
   const projectId = params.id as string;
+  const { addKBItem, getRecentKBItems } = useKB();
 
   // Get project title and workspace info from URL query params
   const queryTitle = searchParams.get('title');
@@ -270,6 +269,27 @@ export default function ProjectPage() {
   const [workspaceId] = useState(queryWorkspaceId || '');
   const [projectStatus, setProjectStatus] = useState<'draft' | 'in-progress' | 'review' | 'complete'>('draft');
   const [isEditingTitle, setIsEditingTitle] = useState(false);
+
+  // Get dynamic sidebar menu with recent KB items
+  const sidebarMenu = useMemo(() => {
+    const recentKBItems = getRecentKBItems(5);
+    const kbMenuItems = [
+      { id: 'add-kb', label: 'Add to KB', icon: <PlusIcon className="w-5 h-5 text-primary" />, onClick: () => setShowCreateTaskModal(true) },
+      { id: 'search-kb', label: 'Search KB', icon: <MagnifyingGlassIcon className="w-5 h-5 text-primary" />, onClick: () => setShowCreateTaskModal(true) },
+      ...recentKBItems.map((item) => ({
+        id: item.id,
+        label: item.applicationName,
+        icon: <BookOpenIcon className="w-4 h-4 text-primary" />,
+        onClick: () => router.push(`/kb/${item.id}`),
+      })),
+    ];
+
+    return SIDEBAR_MENU.map((menu) =>
+      menu.id === 'knowledge'
+        ? { ...menu, items: kbMenuItems }
+        : menu
+    );
+  }, [getRecentKBItems, router]);
   
   // Task & Collaboration state
   const [tasks, setTasks] = useState<Task[]>(MOCK_TASKS);
@@ -717,7 +737,7 @@ export default function ProjectPage() {
                 </p>
               )}
               
-              {SIDEBAR_MENU.map((menu) => (
+              {sidebarMenu.map((menu) => (
                 <div key={menu.id} className="mb-2">
                   <button
                     onClick={() => toggleMenu(menu.id)}
@@ -752,6 +772,7 @@ export default function ProjectPage() {
                         {menu.items.map((item) => (
                           <button
                             key={item.id}
+                            onClick={item.onClick}
                             className="w-full flex items-center gap-2 p-2 pl-4 rounded-lg hover:bg-white/10 transition-colors text-sm"
                             style={{ color: 'var(--color-secondary-text)' }}
                           >
@@ -1280,6 +1301,34 @@ export default function ProjectPage() {
           setShowCreateTaskModal(false);
         }}
         sections={researchSections}
+        onKBSave={(data) => {
+          // Save to KB store
+          addKBItem({
+            applicationName: data.applicationName,
+            categoryDomain: data.categoryDomain,
+            moduleSubDomain: data.moduleSubDomain,
+            functionalComponent: data.functionalComponent,
+            sections: {
+              overview: '',
+              functionalRequirements: '',
+              technicalDetails: '',
+              businessRules: '',
+            },
+          });
+
+          // Add activity
+          const newActivity: ActivityItem = {
+            id: Date.now().toString(),
+            type: 'kb',
+            title: 'Added to KB',
+            description: `"${data.applicationName}" saved to Knowledge Base`,
+            timestamp: new Date(),
+            user: 'You',
+          };
+          setActivities([newActivity, ...activities]);
+
+          setShowCreateTaskModal(false);
+        }}
       />
 
       <ShareModal
@@ -1558,11 +1607,13 @@ function CreateTaskModal({
   onClose,
   onSave,
   sections,
+  onKBSave,
 }: {
   isOpen: boolean;
   onClose: () => void;
   onSave: (task: Omit<Task, 'id'>) => void;
   sections: ResearchSection[];
+  onKBSave?: (data: { applicationName: string; categoryDomain: string; moduleSubDomain: string; functionalComponent: string }) => void;
 }) {
   // Tab state
   const [activeTab, setActiveTab] = useState<'create-task' | 'kb-search'>('create-task');
@@ -1658,9 +1709,13 @@ function CreateTaskModal({
   };
 
   const handleKBSearch = () => {
-    if (applicationName.trim()) {
-      // Handle KB search action
-      console.log('KB Search:', { applicationName, categoryDomain, moduleSubDomain, functionalComponent });
+    if (applicationName.trim() && onKBSave) {
+      onKBSave({
+        applicationName,
+        categoryDomain,
+        moduleSubDomain,
+        functionalComponent,
+      });
       // Reset and close
       setApplicationName('');
       setCategoryDomain('');
@@ -1743,7 +1798,7 @@ function CreateTaskModal({
                 : 'text-gray-500 hover:text-gray-700'
             }`}
           >
-            KB Search
+            Add to KB
             {activeTab === 'kb-search' && (
               <motion.div
                 layoutId="activeModalTab"

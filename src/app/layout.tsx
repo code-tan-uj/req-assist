@@ -2,6 +2,7 @@ import React from 'react';
 import type { Metadata, Viewport } from 'next';
 import '../styles/index.css';
 import { ThemeProvider } from '@/contexts/ThemeContext';
+import { KBProvider } from '@/lib/kb-store';
 import { Toaster } from 'react-hot-toast';
 
 export const viewport: Viewport = {
@@ -33,34 +34,36 @@ export default function RootLayout({
       </head>
       <body>
         <ThemeProvider>
-          {children}
-          <Toaster
-            position="top-right"
-            toastOptions={{
-              duration: 3000,
-              style: {
-                background: 'var(--color-card)',
-                backdropFilter: 'blur(20px)',
-                color: 'var(--color-foreground)',
-                border: '1px solid var(--color-border)',
-                boxShadow: 'var(--shadow-glass)',
-                borderRadius: '16px',
-                padding: '16px',
-              },
-              success: {
-                iconTheme: {
-                  primary: 'var(--color-success)',
-                  secondary: 'white',
+          <KBProvider>
+            {children}
+            <Toaster
+              position="top-right"
+              toastOptions={{
+                duration: 3000,
+                style: {
+                  background: 'var(--color-card)',
+                  backdropFilter: 'blur(20px)',
+                  color: 'var(--color-foreground)',
+                  border: '1px solid var(--color-border)',
+                  boxShadow: 'var(--shadow-glass)',
+                  borderRadius: '16px',
+                  padding: '16px',
                 },
-              },
-              error: {
-                iconTheme: {
-                  primary: 'var(--color-destructive)',
-                  secondary: 'white',
+                success: {
+                  iconTheme: {
+                    primary: 'var(--color-success)',
+                    secondary: 'white',
+                  },
                 },
-              },
-            }}
-          />
+                error: {
+                  iconTheme: {
+                    primary: 'var(--color-destructive)',
+                    secondary: 'white',
+                  },
+                },
+              }}
+            />
+          </KBProvider>
         </ThemeProvider>
       </body>
     </html>
