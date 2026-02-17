@@ -2,14 +2,16 @@
 
 import { useParams, useRouter } from 'next/navigation';
 import { useKB } from '@/lib/kb-store';
-import { BookOpenIcon, ArrowLeftIcon } from '@heroicons/react/24/outline';
+import { BookOpenIcon, ArrowLeftIcon, Cog6ToothIcon, ArrowDownTrayIcon } from '@heroicons/react/24/outline';
 import { useEffect, useState } from 'react';
+import toast from 'react-hot-toast';
 
 export default function KBDetailPage() {
   const params = useParams();
   const router = useRouter();
   const { getKBItem } = useKB();
   const [kbItem, setKBItem] = useState<ReturnType<typeof getKBItem>>();
+  const [showSettings, setShowSettings] = useState(false);
 
   useEffect(() => {
     if (params.id) {
@@ -17,6 +19,46 @@ export default function KBDetailPage() {
       setKBItem(item);
     }
   }, [params.id, getKBItem]);
+
+  const handleDownload = () => {
+    if (!kbItem) return;
+
+    // Create a text representation of the KB item
+    const content = `
+${kbItem.applicationName}
+${kbItem.categoryDomain ? `Category: ${kbItem.categoryDomain}` : ''}
+${kbItem.moduleSubDomain ? `Module: ${kbItem.moduleSubDomain}` : ''}
+${kbItem.functionalComponent ? `Component: ${kbItem.functionalComponent}` : ''}
+
+OVERVIEW
+${kbItem.sections.overview || 'This component provides a comprehensive solution for managing and tracking key business processes...'}
+
+FUNCTIONAL REQUIREMENTS
+${kbItem.sections.functionalRequirements || 'User Management, Data Processing, Reporting & Analytics...'}
+
+TECHNICAL DETAILS
+${kbItem.sections.technicalDetails || 'Architecture, Technology Stack, Security Measures...'}
+
+BUSINESS RULES
+${kbItem.sections.businessRules || 'Data Retention, Approval Workflows, Access Control...'}
+
+---
+Added: ${new Date(kbItem.timestamp).toLocaleDateString()} at ${new Date(kbItem.timestamp).toLocaleTimeString()}
+    `.trim();
+
+    // Create and download file
+    const blob = new Blob([content], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `${kbItem.applicationName.replace(/\s+/g, '_')}_KB.txt`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+
+    toast.success('KB document downloaded successfully!');
+  };
 
   if (!kbItem) {
     return (
@@ -66,6 +108,27 @@ export default function KBDetailPage() {
                   </div>
                 )}
               </div>
+            </div>
+
+            {/* Action Buttons */}
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => setShowSettings(!showSettings)}
+                className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
+                style={{ color: 'var(--color-text)' }}
+                title="Settings"
+              >
+                <Cog6ToothIcon className="w-5 h-5" />
+              </button>
+              <button
+                onClick={handleDownload}
+                className="flex items-center gap-2 px-4 py-2 rounded-lg transition-colors text-white"
+                style={{ background: 'linear-gradient(135deg, #9d7cc4 0%, #c4a0e8 50%, #e8c4f0 100%)' }}
+                title="Download KB Document"
+              >
+                <ArrowDownTrayIcon className="w-5 h-5" />
+                <span className="text-sm font-medium">Download</span>
+              </button>
             </div>
           </div>
         </div>

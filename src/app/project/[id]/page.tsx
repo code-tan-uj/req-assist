@@ -280,7 +280,7 @@ export default function ProjectPage() {
         id: item.id,
         label: item.applicationName,
         icon: <BookOpenIcon className="w-4 h-4 text-primary" />,
-        onClick: () => router.push(`/kb/${item.id}`),
+        onClick: () => window.open(`/kb/${item.id}`, '_blank'),
       })),
     ];
 
