@@ -54,7 +54,7 @@ export default function CreateProjectModal({
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-2xl font-bold" style={{ color: '#2D2D44' }}>
-            Create New Project
+            Create New Workspace
           </h2>
           <button
             onClick={onClose}

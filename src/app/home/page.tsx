@@ -72,31 +72,31 @@ export default function HomePage() {
     return () => observer.disconnect();
   }, []);
 
-  const handleCreateWorkspace = (workspace: {
+  const handleCreateWorkspace = (project: {
     name: string;
     description: string;
-    projectCount: number;
+    collaborators: string[];
     tags: string[];
   }) => {
+    const projectId = Date.now().toString();
+
+    // Keep the workspaces list in sync (used for / palette in SearchBar)
     const newWorkspace: Workspace = {
-      ...workspace,
-      id: Date.now().toString(),
+      id: projectId,
+      name: project.name,
+      description: project.description,
+      projectCount: 0,
+      tags: project.tags,
       updatedAt: 'Just now',
     };
-
     setWorkspaces([newWorkspace, ...workspaces]);
     setIsCreateModalOpen(false);
 
-    toast.success('Workspace created successfully! Redirecting...', {
-      duration: 2000,
-    });
+    toast.success('Project created! Opening canvas...', { duration: 1500 });
 
-    // Redirect to the newly created workspace with name and description as query params
-    const params = new URLSearchParams({
-      name: newWorkspace.name,
-      description: newWorkspace.description || '',
-    });
-    router.push(`/workspace/${newWorkspace.id}?${params.toString()}`);
+    // Navigate directly to the project canvas
+    const params = new URLSearchParams({ title: project.name });
+    router.push(`/project/${projectId}?${params.toString()}`);
   };
 
   const handleDeleteWorkspace = (workspace: Workspace) => {
@@ -123,7 +123,9 @@ export default function HomePage() {
   };
 
   const handleWorkspaceSelect = (workspaceId: string) => {
-    router.push(`/workspace/${workspaceId}`);
+    const ws = workspaces.find((w) => w.id === workspaceId);
+    const params = new URLSearchParams({ title: ws?.name || 'Project' });
+    router.push(`/project/${workspaceId}?${params.toString()}`);
   };
 
   const handleQuickAction = (action: 'search-kb' | 'initiate-change' | 'create-workspace') => {
@@ -337,22 +339,20 @@ export default function HomePage() {
       <MyProjectsModal
         isOpen={isMyProjectsModalOpen}
         onClose={() => setIsMyProjectsModalOpen(false)}
-        onSelect={(workspaceId: string) => {
-          // Navigate to the workspace page for the selected workspace
+        onSelect={(projectId: string, projectName: string) => {
           setIsMyProjectsModalOpen(false);
-          router.push(`/workspace/${workspaceId}`);
+          const params = new URLSearchParams({ title: projectName });
+          router.push(`/project/${projectId}?${params.toString()}`);
         }}
       />
     </div>
   );
 }
 
-function MyProjectsModal({ isOpen, onClose, onSelect }: { isOpen: boolean; onClose: () => void; onSelect: (id: string) => void; }) {
-  // Use workspace IDs that match `initialWorkspaces` in this file
+function MyProjectsModal({ isOpen, onClose, onSelect }: { isOpen: boolean; onClose: () => void; onSelect: (id: string, name: string) => void; }) {
   const collections = [
     { id: '1', title: 'Market Analysis 2026' },
     { id: '2', title: 'Product Research' },
-    // { id: '3', title: 'Academic Studies' },
   ];
 
   if (!isOpen) return null;
@@ -361,27 +361,22 @@ function MyProjectsModal({ isOpen, onClose, onSelect }: { isOpen: boolean; onClo
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 backdrop-blur-sm bg-black/50" onClick={onClose}>
       <motion.div initial={{ scale: 0.95, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.95, opacity: 0 }} className="w-full max-w-md rounded-2xl p-6" style={{ background: 'rgba(255,255,255,0.95)' }} onClick={(e) => e.stopPropagation()}>
         <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-bold">My Collections</h3>
-          <button onClick={onClose} className="p-2 rounded-lg hover:bg-gray-100 transition-colors">Close</button>
+          <h3 className="text-lg font-bold text-gray-800">My Collections</h3>
+          <button onClick={onClose} className="p-2 rounded-lg hover:bg-gray-100 transition-colors text-sm text-gray-500">Close</button>
         </div>
 
         <div className="grid gap-3">
           {collections.map((c) => (
-            <button key={c.id} onClick={() => onSelect(c.id)} className="w-full p-3 rounded-xl hover:bg-gray-100 transition-colors text-left">
+            <button key={c.id} onClick={() => onSelect(c.id, c.title)} className="w-full p-3 rounded-xl hover:bg-gray-100 transition-colors text-left">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="font-medium">{c.title}</p>
-                  <p className="text-xs text-[var(--color-secondary-text)]">Open the {c.title} collection</p>
+                  <p className="font-medium text-gray-800">{c.title}</p>
+                  <p className="text-xs text-gray-500">Open project canvas</p>
                 </div>
-                <div className="text-sm text-[var(--color-secondary-text)]">›</div>
+                <div className="text-gray-400">›</div>
               </div>
             </button>
           ))}
-
-          {/* <button onClick={() => onSelect('create-new')} className="w-full p-3 rounded-xl border-dashed border-2 border-gray-200 hover:bg-gray-50 flex items-center gap-3">
-            <span className="text-2xl">+</span>
-            <span className="font-medium">Create New Collection</span>
-          </button> */}
         </div>
       </motion.div>
     </div>

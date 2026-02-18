@@ -645,15 +645,6 @@ export default function ProjectPage() {
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
               </svg>
-              <button 
-                onClick={() => workspaceId ? router.push(`/workspace/${workspaceId}?name=${encodeURIComponent(workspaceName)}`) : router.back()} 
-                className="hover:text-[var(--color-primary)] transition-colors"
-              >
-                {workspaceName}
-              </button>
-              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-              </svg>
               {isEditingTitle ? (
                 <input
                   type="text"
