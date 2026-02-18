@@ -29,10 +29,11 @@ export default function Navbar({ activeTab = 'workspace' }: NavbarProps) {
       <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
         {/* Left Section - Logo & Brand */}
         <div className="flex items-center gap-4">
-          <div className="flex items-center gap-3">
-            <div
-              className="w-10 h-10 rounded-full gradient-bg flex items-center justify-center"
-            >
+          <button
+            onClick={() => router.push('/home')}
+            className="flex items-center gap-3 hover:opacity-80 transition-opacity"
+          >
+            <div className="w-10 h-10 rounded-full gradient-bg flex items-center justify-center">
               <svg
                 className="w-6 h-6 text-white"
                 fill="none"
@@ -47,13 +48,13 @@ export default function Navbar({ activeTab = 'workspace' }: NavbarProps) {
                 />
               </svg>
             </div>
-            <div>
+            <div className="text-left">
               <h1 className="text-xl font-bold gradient-text">Req-Assist</h1>
               <p className="text-xs opacity-70" style={{ color: 'var(--color-secondary-text)' }}>
                 AI Research Platform
               </p>
             </div>
-          </div>
+          </button>
         </div>
 
         {/* Center Section - Navigation Tabs */}

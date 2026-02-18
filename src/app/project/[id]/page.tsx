@@ -21,7 +21,6 @@ import {
   BeakerIcon,
   ShieldCheckIcon,
   CheckCircleIcon,
-  XMarkIcon,
   ChevronDownIcon,
   ChevronUpIcon,
   CalendarIcon,
@@ -231,6 +230,25 @@ const MOCK_CONVERSATIONS = [
   { id: '3', title: 'Gap Analysis', date: '1w ago' },
 ];
 
+const MOCK_WORKSPACES = [
+  {
+    id: '1',
+    name: 'Market Analysis 2026',
+    description: 'Comprehensive market research for emerging tech sectors',
+    projectCount: 5,
+    tags: ['market', 'tech', 'analysis'],
+    updatedAt: '2 hours ago',
+  },
+  {
+    id: '2',
+    name: 'Product Research',
+    description: 'User research and competitive analysis for new product features',
+    projectCount: 3,
+    tags: ['product', 'UX', 'research'],
+    updatedAt: '1 day ago',
+  },
+];
+
 export default function ProjectPage() {
   const router = useRouter();
   const params = useParams();
@@ -265,8 +283,10 @@ export default function ProjectPage() {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [expandedMenus, setExpandedMenus] = useState<string[]>(['research']);
   const [projectTitle, setProjectTitle] = useState(queryTitle || 'Untitled Project');
-  const [workspaceName] = useState(queryWorkspace || 'Workspace');
-  const [workspaceId] = useState(queryWorkspaceId || '');
+  const [workspaceName, setWorkspaceName] = useState(queryWorkspace || 'Workspace');
+  const [workspaceId, setWorkspaceId] = useState(queryWorkspaceId || '');
+  const [showAddToWorkspaceModal, setShowAddToWorkspaceModal] = useState(false);
+  const [pendingWorkspaceId, setPendingWorkspaceId] = useState('');
   const [projectStatus, setProjectStatus] = useState<'draft' | 'in-progress' | 'review' | 'complete'>('draft');
   const [isEditingTitle, setIsEditingTitle] = useState(false);
 
@@ -471,6 +491,19 @@ export default function ProjectPage() {
     setResearchConfig(config);
     setHasConfigured(true);
     setShowConfigModal(false);
+
+    // Commit the pending user message and clear the input box
+    if (inputValue.trim()) {
+      const userMessage: Message = {
+        id: Date.now().toString(),
+        role: 'user',
+        content: inputValue,
+        timestamp: new Date(),
+      };
+      setMessages(prev => [...prev, userMessage]);
+      setInputValue('');
+    }
+
     startResearchGeneration();
   };
 
@@ -725,6 +758,14 @@ export default function ProjectPage() {
                 <button className="w-full flex items-center gap-3 p-2 rounded-lg hover:bg-white/10 transition-colors">
                   <span className="text-lg"><MagnifyingGlassIcon className="w-5 h-5 text-primary" /></span>
                   {!sidebarCollapsed && <span className="text-sm">Search Chats</span>}
+                </button>
+                <button
+                  onClick={() => setShowAddToWorkspaceModal(true)}
+                  className="w-full flex items-center gap-3 p-2 rounded-lg hover:bg-white/10 transition-colors"
+                  title="Add to Workspace"
+                >
+                  <span className="text-lg"><ArrowUpTrayIcon className="w-5 h-5 text-primary" /></span>
+                  {!sidebarCollapsed && <span className="text-sm">Add to Workspace</span>}
                 </button>
               </div>
             </div>
@@ -1329,6 +1370,11 @@ export default function ProjectPage() {
 
           setShowCreateTaskModal(false);
         }}
+        onAddToWorkspace={(ws) => {
+          setWorkspaceName(ws.name);
+          setWorkspaceId(ws.id);
+          setShowCreateTaskModal(false);
+        }}
       />
 
       <ShareModal
@@ -1340,6 +1386,146 @@ export default function ProjectPage() {
         isOpen={showExportModal}
         onClose={() => setShowExportModal(false)}
       />
+
+      {/* Add to Workspace Modal */}
+      <AnimatePresence>
+        {showAddToWorkspaceModal && (
+          <>
+            {/* Backdrop */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 bg-black/60 z-[9990] backdrop-blur-sm"
+              onClick={() => setShowAddToWorkspaceModal(false)}
+            />
+            {/* Modal panel */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 20 }}
+              transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+              className="fixed inset-0 z-[9991] flex items-center justify-center p-4 pointer-events-none"
+            >
+              <div
+                className="rounded-2xl w-full max-w-md pointer-events-auto overflow-hidden"
+                style={{ background: '#ffffff', boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)' }}
+              >
+                {/* Header */}
+                <div className="flex items-center justify-between p-5 border-b border-gray-200">
+                  <div>
+                    <h2 className="text-lg font-semibold text-gray-800">
+                      Add to Workspace
+                    </h2>
+                    <p className="text-xs mt-0.5 text-gray-500">
+                      Select a workspace to move <span className="font-medium text-purple-600">{projectTitle}</span>
+                    </p>
+                  </div>
+                  <button
+                    onClick={() => setShowAddToWorkspaceModal(false)}
+                    className="p-1 rounded-lg hover:bg-gray-100 transition-colors"
+                  >
+                    <svg className="w-6 h-6 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+                </div>
+
+                {/* Workspace list */}
+                <div className="p-4 space-y-3 max-h-80 overflow-y-auto">
+                  {MOCK_WORKSPACES.map((ws) => {
+                    const isCurrent = ws.id === workspaceId;
+                    const isSelected = ws.id === pendingWorkspaceId;
+                    return (
+                      <button
+                        key={ws.id}
+                        onClick={() => setPendingWorkspaceId(ws.id)}
+                        className={`w-full text-left p-4 rounded-xl border transition-all ${
+                          isSelected
+                            ? 'border-purple-500 bg-purple-50 ring-2 ring-purple-200'
+                            : isCurrent
+                            ? 'border-purple-200 bg-purple-25'
+                            : 'border-gray-200 hover:bg-gray-50 hover:border-gray-300'
+                        }`}
+                      >
+                        <div className="flex items-start justify-between gap-3">
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2 mb-1">
+                              <span className="text-sm font-semibold text-gray-800 truncate">
+                                {ws.name}
+                              </span>
+                              {isCurrent && (
+                                <span className="flex-shrink-0 text-[10px] font-medium px-2 py-0.5 rounded-full bg-purple-100 text-purple-600">
+                                  Current
+                                </span>
+                              )}
+                              {isSelected && !isCurrent && (
+                                <span className="flex-shrink-0 text-[10px] font-medium px-2 py-0.5 rounded-full bg-green-100 text-green-600">
+                                  Selected
+                                </span>
+                              )}
+                            </div>
+                            <p className="text-xs text-gray-500 line-clamp-2 mb-2">
+                              {ws.description}
+                            </p>
+                            <div className="flex flex-wrap gap-1">
+                              {ws.tags.map((tag) => (
+                                <span
+                                  key={tag}
+                                  className="text-[10px] px-2 py-0.5 rounded-full bg-purple-50 text-purple-600"
+                                >
+                                  {tag}
+                                </span>
+                              ))}
+                            </div>
+                          </div>
+                          <div className="flex-shrink-0 text-right">
+                            <span className="text-[10px] text-gray-500">
+                              {ws.projectCount} projects
+                            </span>
+                            <p className="text-[10px] text-gray-400 mt-0.5">
+                              {ws.updatedAt}
+                            </p>
+                          </div>
+                        </div>
+                      </button>
+                    );
+                  })}
+                </div>
+
+                {/* Footer */}
+                <div className="p-4 border-t border-gray-200 flex justify-end gap-3">
+                  <button
+                    onClick={() => {
+                      setPendingWorkspaceId('');
+                      setShowAddToWorkspaceModal(false);
+                    }}
+                    className="px-4 py-2 text-sm rounded-xl font-medium bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    disabled={!pendingWorkspaceId}
+                    onClick={() => {
+                      const ws = MOCK_WORKSPACES.find(w => w.id === pendingWorkspaceId);
+                      if (ws) {
+                        setWorkspaceName(ws.name);
+                        setWorkspaceId(ws.id);
+                      }
+                      setPendingWorkspaceId('');
+                      setShowAddToWorkspaceModal(false);
+                    }}
+                    className="px-4 py-2 text-sm rounded-xl font-medium text-white disabled:opacity-40 disabled:cursor-not-allowed transition-all"
+                    style={{ background: 'linear-gradient(135deg, #9d7cc4 0%, #c4a0e8 50%, #e8c4f0 100%)' }}
+                  >
+                    Add to Workspace
+                  </button>
+                </div>
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
 
       {/* Command Palette - Rendered at root level for proper z-index stacking */}
       <AnimatePresence>
@@ -1547,30 +1733,19 @@ function ConfigurationModal({
             <label className="block text-sm font-medium mb-3" style={{ color: '#2D2D44' }}>
               Research Depth*
             </label>
-            <div className="grid grid-cols-3 gap-4">
-              {depthOptions.map((option) => (
-                <button
-                  key={option.value}
-                  onClick={() => setDepth(option.value as 'Quick' | 'Standard' | 'Deep')}
-                  className={`p-4 rounded-xl text-left transition-all ${
-                    depth === option.value
-                      ? 'gradient-bg text-white shadow-lg'
-                      : 'hover:bg-gray-100'
-                  }`}
-                  style={depth !== option.value ? { 
-                    background: 'rgba(255, 255, 255, 0.8)',
-                    border: '1px solid rgba(0, 0, 0, 0.1)'
-                  } : {}}
-                >
-                  <div className="font-bold mb-1">{option.value}</div>
-                  <div className={`text-xs mb-2 ${depth === option.value ? 'text-white/80' : ''}`} style={depth !== option.value ? { color: '#6B6B85' } : {}}>
-                    {option.duration}
-                  </div>
-                  <div className={`text-xs whitespace-pre-line ${depth === option.value ? 'text-white/70' : ''}`} style={depth !== option.value ? { color: '#6B6B85' } : {}}>
-                    {option.description}
-                  </div>
-                </button>
-              ))}
+            <div className="flex items-center gap-4">
+              <span className="font-bold" style={{ color: '#2D2D44' }}>Deep Research</span>
+              <label className="relative inline-flex items-center cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={depth === 'Deep'}
+                  onChange={() => setDepth(depth === 'Deep' ? 'Standard' : 'Deep')}
+                  className="sr-only peer"
+                />
+                <div
+                  className="w-11 h-6 bg-gray-200 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-purple-600"
+                ></div>
+              </label>
             </div>
           </div>
         </div>
@@ -1591,7 +1766,8 @@ function ConfigurationModal({
           <button
             onClick={handleSave}
             disabled={!industry || !geography || !depth}
-            className="flex-1 px-6 py-3 rounded-xl font-medium text-white gradient-bg hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+            className="flex-1 px-6 py-3 rounded-xl font-medium text-white disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+            style={{ background: 'linear-gradient(135deg, #9d7cc4 0%, #c4a0e8 50%, #e8c4f0 100%)' }}
           >
             {existingConfig ? 'Update Research' : 'Save'}
           </button>
@@ -1608,15 +1784,17 @@ function CreateTaskModal({
   onSave,
   sections,
   onKBSave,
+  onAddToWorkspace,
 }: {
   isOpen: boolean;
   onClose: () => void;
   onSave: (task: Omit<Task, 'id'>) => void;
   sections: ResearchSection[];
   onKBSave?: (data: { applicationName: string; categoryDomain: string; moduleSubDomain: string; functionalComponent: string }) => void;
+  onAddToWorkspace?: (workspace: { id: string; name: string }) => void;
 }) {
   // Tab state
-  const [activeTab, setActiveTab] = useState<'create-task' | 'kb-search'>('create-task');
+  const [activeTab, setActiveTab] = useState<'create-task' | 'kb-search' | 'add-workspace'>('create-task');
   
   // Create Task form state
   const [title, setTitle] = useState('');
@@ -1625,6 +1803,9 @@ function CreateTaskModal({
   const [assignee, setAssignee] = useState('');
   const [deadline, setDeadline] = useState('');
   const [linkedSection, setLinkedSection] = useState('');
+
+  // Add to Workspace tab state
+  const [selectedTabWsId, setSelectedTabWsId] = useState('');
 
   // KB Search form state
   const [applicationName, setApplicationName] = useState('');
@@ -1793,13 +1974,29 @@ function CreateTaskModal({
           <button
             onClick={() => setActiveTab('kb-search')}
             className={`flex-1 py-3 text-sm font-semibold transition-colors relative ${
-              activeTab === 'kb-search' 
-                ? 'text-purple-600' 
+              activeTab === 'kb-search'
+                ? 'text-purple-600'
                 : 'text-gray-500 hover:text-gray-700'
             }`}
           >
             Add to KB
             {activeTab === 'kb-search' && (
+              <motion.div
+                layoutId="activeModalTab"
+                className="absolute bottom-0 left-0 right-0 h-0.5 bg-purple-600"
+              />
+            )}
+          </button>
+          <button
+            onClick={() => setActiveTab('add-workspace')}
+            className={`flex-1 py-3 text-sm font-semibold transition-colors relative ${
+              activeTab === 'add-workspace'
+                ? 'text-purple-600'
+                : 'text-gray-500 hover:text-gray-700'
+            }`}
+          >
+            Add to Workspace
+            {activeTab === 'add-workspace' && (
               <motion.div
                 layoutId="activeModalTab"
                 className="absolute bottom-0 left-0 right-0 h-0.5 bg-purple-600"
@@ -1921,7 +2118,7 @@ function CreateTaskModal({
                   </button>
                 </div>
               </motion.div>
-            ) : (
+            ) : activeTab === 'kb-search' ? (
               <motion.div
                 key="kb-search"
                 initial={{ opacity: 0, x: 10 }}
@@ -2083,7 +2280,81 @@ function CreateTaskModal({
                     className="flex-1 px-6 py-3 rounded-xl font-medium text-white disabled:opacity-50 disabled:cursor-not-allowed transition-all"
                     style={{ background: 'linear-gradient(135deg, #9d7cc4 0%, #c4a0e8 50%, #e8c4f0 100%)' }}
                   >
-                    Search KB
+                    Add to KB
+                  </button>
+                </div>
+              </motion.div>
+            ) : (
+              <motion.div
+                key="add-workspace"
+                initial={{ opacity: 0, x: 10 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -10 }}
+                transition={{ duration: 0.15 }}
+                className="space-y-3"
+              >
+                <p className="text-xs text-gray-500 mb-1">
+                  Select a workspace to move this project into.
+                </p>
+                {MOCK_WORKSPACES.map((ws) => {
+                  const isSelected = ws.id === selectedTabWsId;
+                  return (
+                    <button
+                      key={ws.id}
+                      onClick={() => setSelectedTabWsId(ws.id)}
+                      className={`w-full text-left p-4 rounded-xl border transition-all ${
+                        isSelected
+                          ? 'border-purple-500 bg-purple-50 ring-2 ring-purple-200'
+                          : 'border-gray-200 hover:bg-gray-50 hover:border-gray-300'
+                      }`}
+                    >
+                      <div className="flex items-start justify-between gap-3">
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 mb-1">
+                            <p className="text-sm font-semibold text-gray-800 truncate">{ws.name}</p>
+                            {isSelected && (
+                              <span className="flex-shrink-0 text-[10px] font-medium px-2 py-0.5 rounded-full bg-green-100 text-green-600">
+                                Selected
+                              </span>
+                            )}
+                          </div>
+                          <p className="text-xs text-gray-500 line-clamp-2 mb-2">{ws.description}</p>
+                          <div className="flex flex-wrap gap-1">
+                            {ws.tags.map((tag) => (
+                              <span key={tag} className="text-[10px] px-2 py-0.5 rounded-full bg-purple-50 text-purple-600">
+                                {tag}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+                        <div className="flex-shrink-0 text-right">
+                          <span className="text-[10px] text-gray-500">{ws.projectCount} projects</span>
+                          <p className="text-[10px] text-gray-400 mt-0.5">{ws.updatedAt}</p>
+                        </div>
+                      </div>
+                    </button>
+                  );
+                })}
+
+                <div className="flex gap-3 pt-2">
+                  <button
+                    onClick={() => { setSelectedTabWsId(''); onClose(); }}
+                    className="flex-1 px-6 py-3 rounded-xl font-medium bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    disabled={!selectedTabWsId}
+                    onClick={() => {
+                      const ws = MOCK_WORKSPACES.find(w => w.id === selectedTabWsId);
+                      if (ws && onAddToWorkspace) onAddToWorkspace({ id: ws.id, name: ws.name });
+                      setSelectedTabWsId('');
+                      onClose();
+                    }}
+                    className="flex-1 px-6 py-3 rounded-xl font-medium text-white disabled:opacity-40 disabled:cursor-not-allowed transition-all"
+                    style={{ background: 'linear-gradient(135deg, #9d7cc4 0%, #c4a0e8 50%, #e8c4f0 100%)' }}
+                  >
+                    Add to Workspace
                   </button>
                 </div>
               </motion.div>
