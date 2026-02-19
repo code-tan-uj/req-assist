@@ -111,7 +111,7 @@ export default function SearchBar({ onSearch, workspaces, onWorkspaceSelect, onQ
       onQuickAction('search-kb');
     } else if (action === 'Initate Change') {
       onQuickAction('initiate-change');
-    } else if (action === 'Create Work Space') {
+    } else if (action === 'Create Workspace') {
       onQuickAction('create-workspace');
     }
   };
