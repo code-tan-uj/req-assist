@@ -14,7 +14,7 @@ interface CreateWorkspaceModalProps {
   }) => void;
 }
 
-const MOCK_USERS = ['Alice', 'Bob', 'Carol', 'Dave', 'Eve'];
+const MOCK_USERS = ['Priya', 'Arjun', 'Sneha', 'Rahul', 'Kavya'];
 
 export default function CreateWorkspaceModal({
   isOpen,

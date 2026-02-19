@@ -205,17 +205,17 @@ const PROJECT_MANAGEMENT = [
 
 // Mock data
 const MOCK_TASKS: Task[] = [
-  { id: '1', title: 'Analyze competitor pricing', status: 'in-progress', priority: 'high', assignee: 'Alice', deadline: 'Feb 15', linkedSection: 'Market Overview', progress: 60 },
-  { id: '2', title: 'Complete SWOT analysis', status: 'todo', priority: 'medium', assignee: 'Bob', deadline: 'Feb 18' },
-  { id: '3', title: 'Review market data', status: 'review', priority: 'high', assignee: 'Carol', deadline: 'Feb 14' },
-  { id: '4', title: 'Draft executive summary', status: 'done', priority: 'medium', assignee: 'Alice', deadline: 'Feb 10' },
-  { id: '5', title: 'Validate TAM/SAM/SOM', status: 'done', priority: 'low', assignee: 'Bob', deadline: 'Feb 12' },
+  { id: '1', title: 'Analyze competitor pricing', status: 'in-progress', priority: 'high', assignee: 'Priya', deadline: 'Feb 15', linkedSection: 'Market Overview', progress: 60 },
+  { id: '2', title: 'Complete SWOT analysis', status: 'todo', priority: 'medium', assignee: 'Arjun', deadline: 'Feb 18' },
+  { id: '3', title: 'Review market data', status: 'review', priority: 'high', assignee: 'Sneha', deadline: 'Feb 14' },
+  { id: '4', title: 'Draft executive summary', status: 'done', priority: 'medium', assignee: 'Priya', deadline: 'Feb 10' },
+  { id: '5', title: 'Validate TAM/SAM/SOM', status: 'done', priority: 'low', assignee: 'Arjun', deadline: 'Feb 12' },
 ];
 
 const MOCK_ACTIVITIES: ActivityItem[] = [
   { id: '1', type: 'ai', title: 'Research generated', description: 'Market Overview section created', timestamp: new Date(Date.now() - 2 * 60 * 60 * 1000), user: 'Claude AI' },
-  { id: '2', type: 'edit', title: 'Section edited', description: 'SWOT Analysis updated by Alice', timestamp: new Date(Date.now() - 5 * 60 * 60 * 1000), user: 'Alice' },
-  { id: '3', type: 'task', title: 'Task completed', description: '"Analyze pricing" marked done', timestamp: new Date(Date.now() - 24 * 60 * 60 * 1000), user: 'Bob' },
+  { id: '2', type: 'edit', title: 'Section edited', description: 'SWOT Analysis updated by Priya', timestamp: new Date(Date.now() - 5 * 60 * 60 * 1000), user: 'Priya' },
+  { id: '3', type: 'task', title: 'Task completed', description: '"Analyze pricing" marked done', timestamp: new Date(Date.now() - 24 * 60 * 60 * 1000), user: 'Arjun' },
   { id: '4', type: 'kb', title: 'Added to KB', description: '"Competitor positioning" saved to KB', timestamp: new Date(Date.now() - 48 * 60 * 60 * 1000), user: 'You' },
 ];
 
@@ -276,9 +276,8 @@ export default function ProjectPage() {
   
   // UI state
   const [showConfigModal, setShowConfigModal] = useState(false);
-  const [hasConfigured, setHasConfigured] = useState(false);
   const [researchConfig, setResearchConfig] = useState<ResearchConfig | null>(null);
-  const [showSidePanel, setShowSidePanel] = useState(true);
+  const [showSidePanel, setShowSidePanel] = useState(false);
   const [sidePanelTab, setSidePanelTab] = useState<'tasks' | 'versions' | 'activity' | 'more'>('tasks');
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [expandedMenus, setExpandedMenus] = useState<string[]>(['research']);
@@ -365,7 +364,8 @@ export default function ProjectPage() {
     const value = e.target.value;
     setInputValue(value);
 
-    if (value.startsWith('/')) {
+    // Only show palette while typing the command name (starts with / and no space yet)
+    if (value.startsWith('/') && !value.includes(' ')) {
       setShowCommandPalette(true);
       setSelectedCommandIndex(0);
     } else {
@@ -406,12 +406,6 @@ export default function ProjectPage() {
   const handleSend = async () => {
     if (!inputValue.trim()) return;
 
-    // Check if this is the first research query
-    if (!hasConfigured) {
-      setShowConfigModal(true);
-      return;
-    }
-
     // Add user message
     const userMessage: Message = {
       id: Date.now().toString(),
@@ -431,9 +425,9 @@ export default function ProjectPage() {
     setIsGenerating(true);
     const steps = [
       '⏳ Analyzing query...',
-      '🔍 Gathering market data...',
+      '🔍 Gathering silver market data...',
       '📈 Generating Executive Summary...',
-      '🏢 Analyzing competitors...',
+      '🏦 Analyzing lending landscape...',
       '✅ Research complete!',
     ];
 
@@ -449,22 +443,36 @@ export default function ProjectPage() {
         id: `${timestamp}-1`,
         title: 'Executive Summary',
         content:
-          'The market shows significant growth potential with emerging opportunities in AI and machine learning sectors. Key findings indicate a 25% YoY growth rate with strong investor interest.',
+          'The Loan Against Silver (LAS) market in India is experiencing accelerated growth, driven by rising silver prices, increased household silver holdings, and financial inclusion mandates. Key findings indicate a 32% YoY growth rate in silver-backed lending, with NBFCs and cooperative banks emerging as the dominant originators. Silver\'s lower price per gram compared to gold makes it accessible to lower-income and rural borrowers, creating a largely untapped credit segment estimated at ₹45,000 Cr.',
         icon: 'clipboard',
       },
       {
         id: `${timestamp}-2`,
         title: 'Market Overview',
         content:
-          'Current market size is estimated at $50B with projected growth to $75B by 2027. Major players include established tech giants and innovative startups disrupting traditional models.',
+          'The organized Loan Against Silver market is estimated at ₹38,000 Cr (FY2024), projected to reach ₹72,000 Cr by FY2028 at a CAGR of ~17%. India holds approximately 25,000 tonnes of household silver, of which only 6–8% is currently monetized through formal lending channels. Average ticket sizes range from ₹15,000 to ₹2.5 Lakh, with LTV ratios between 60–75% based on RBI guidelines. Silver prices have appreciated ~28% over the past 18 months, improving collateral quality and lender confidence. Seasonal demand spikes during festivals (Diwali, Akshaya Tritiya) and agricultural cycles drive 35–40% of annual disbursals.',
         icon: 'globe',
       },
       {
         id: `${timestamp}-3`,
-        title: 'Competitive Analysis',
+        title: 'Competitive Landscape',
         content:
-          'Top competitors identified: Company A (30% market share), Company B (25%), Company C (15%). Each competitor brings unique value propositions and technological advantages.',
+          'Key players include Muthoot Finance (market leader, ~22% share), Manappuram Finance (~18%), IIFL Finance (~12%), and a fragmented tail of 400+ NBFCs and cooperative banks. PSU banks like SBI and PNB offer silver loans at 8.5–10.5% interest but with slower disbursal (2–4 days). NBFCs command 9.5–14% interest rates with same-day or 30-minute disbursal, winning on speed. Fintech disruptors (Rupeek, oro.com) are piloting doorstep silver appraisal and digital pledge models but face storage and regulatory challenges. Credit losses remain low (<1.2% NPA) due to strong collateral liquidation markets.',
         icon: 'chart',
+      },
+      {
+        id: `${timestamp}-4`,
+        title: 'Regulatory Framework',
+        content:
+          'RBI mandates a maximum LTV of 75% for loans against silver jewellery by NBFCs. Banks may extend up to 85% LTV under specific product structures. All lenders must maintain RBI-compliant storage (secure vaults, third-party custodians). KYC norms require Aadhaar + PAN for loans above ₹50,000. The RBI\'s 2023 circular on Loan Against Gold (which also impacts silver) requires independent valuation of collateral and periodic portfolio audits. SEBI\'s commodity derivatives guidelines indirectly influence silver price benchmarks used in LTV computation. States like Kerala and Maharashtra have local pawnbroker regulations that overlap with NBFC operations.',
+        icon: 'shield',
+      },
+      {
+        id: `${timestamp}-5`,
+        title: 'Opportunity & Recommendations',
+        content:
+          'Key opportunities: (1) Rural penetration — only 18% of LAS disbursals currently reach tier-3+ towns, vs 60%+ silver holding concentration in rural areas. (2) Digital pledge management — blockchain-based pledge certificates could reduce fraud and improve secondary market liquidity. (3) Co-lending models — bank-NBFC partnerships can unlock lower cost of funds (7–8%) while retaining fast disbursal. (4) Bullion-linked savings + credit bundles for self-help groups. Recommendations: Build a multi-channel origination platform (branch + doorstep + app) targeting rural women borrowers; integrate real-time MCX silver price feeds for dynamic LTV calculation; establish tie-ups with certified assayers for standardized purity verification.',
+        icon: 'lightbulb',
       },
     ];
 
@@ -489,7 +497,6 @@ export default function ProjectPage() {
 
   const handleConfigSave = (config: ResearchConfig) => {
     setResearchConfig(config);
-    setHasConfigured(true);
     setShowConfigModal(false);
 
     // Commit the pending user message and clear the input box
@@ -524,7 +531,6 @@ export default function ProjectPage() {
         timestamp: new Date(),
       };
       setMessages([userMessage]);
-      setHasConfigured(true); // Skip config modal for queries from homepage
       setHasInitialized(true);
       
       // Start research generation after a short delay
@@ -544,7 +550,6 @@ export default function ProjectPage() {
         timestamp: new Date(),
       };
       setMessages([userMessage]);
-      setHasConfigured(true);
       setHasInitialized(true);
       
       setTimeout(() => {
@@ -763,7 +768,7 @@ export default function ProjectPage() {
 
             {/* Menu Sections */}
             <div className="flex-1 overflow-y-auto p-3">
-              {!sidebarCollapsed && (
+              {/* {!sidebarCollapsed && (
                 <p className="text-xs font-medium uppercase tracking-wider mb-2" style={{ color: 'var(--color-secondary-text)' }}>
                   Workspace Tools
                 </p>
@@ -816,7 +821,7 @@ export default function ProjectPage() {
                     )}
                   </AnimatePresence>
                 </div>
-              ))}
+              ))} */}
 
               {/* Project Management Section */}
               {!sidebarCollapsed && (
@@ -2039,9 +2044,9 @@ function CreateTaskModal({
                       className="w-full px-4 py-3 rounded-xl bg-gray-50 border border-gray-200 text-gray-800 focus:border-purple-300 focus:ring-2 focus:ring-purple-100 outline-none transition-all"
                     >
                       <option value="">Select assignee</option>
-                      <option value="Alice">Alice</option>
-                      <option value="Bob">Bob</option>
-                      <option value="Carol">Carol</option>
+                      <option value="Priya">Priya</option>
+                      <option value="Arjun">Arjun</option>
+                      <option value="Sneha">Sneha</option>
                     </select>
                   </div>
                   <div>
@@ -2541,9 +2546,9 @@ function ShareModal({
   const [permission, setPermission] = useState<'view' | 'edit' | 'comment'>('view');
 
   const users = [
-    { id: '1', name: 'Alice Johnson', email: 'alice@company.com' },
-    { id: '2', name: 'Bob Smith', email: 'bob@company.com' },
-    { id: '3', name: 'Carol Davis', email: 'carol@company.com' },
+    { id: '1', name: 'Priya Sharma', email: 'priya@company.com' },
+    { id: '2', name: 'Arjun Mehta', email: 'arjun@company.com' },
+    { id: '3', name: 'Sneha Iyer', email: 'sneha@company.com' },
   ];
 
   const handleCopyLink = () => {
