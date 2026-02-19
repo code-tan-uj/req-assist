@@ -2370,21 +2370,18 @@ function ExportModal({
   isOpen: boolean;
   onClose: () => void;
 }) {
-  const [selectedFormat, setSelectedFormat] = useState<'pdf' | 'docx' | 'md' | 'json'>('pdf');
-  const [selectedContent, setSelectedContent] = useState<string[]>(['research', 'tasks', 'versions']);
+  const [selectedFormat, setSelectedFormat] = useState<'pdf' | 'docx' | 'md'>('pdf');
+  const [selectedContent, setSelectedContent] = useState<string[]>(['research', 'chat', 'sources']);
   const [isExporting, setIsExporting] = useState(false);
 
   const formats = [
     { id: 'pdf', name: 'PDF Document', icon: '📄', description: 'Best for sharing and printing' },
     { id: 'docx', name: 'Word Document', icon: '📝', description: 'Editable document format' },
     { id: 'md', name: 'Markdown', icon: '📋', description: 'Plain text with formatting' },
-    { id: 'json', name: 'JSON Data', icon: '🔧', description: 'Raw data export' },
   ];
 
   const contentOptions = [
     { id: 'research', name: 'Research Results', description: 'All research sections and findings' },
-    { id: 'tasks', name: 'Tasks', description: 'Task list and progress' },
-    { id: 'versions', name: 'Version History', description: 'All saved versions' },
     { id: 'chat', name: 'Chat History', description: 'Full conversation log' },
     { id: 'sources', name: 'Sources & Citations', description: 'Referenced materials' },
   ];
@@ -2436,12 +2433,12 @@ function ExportModal({
           {/* File Format Selection */}
           <div>
             <label className="block text-sm font-medium mb-3" style={{ color: '#2D2D44' }}>Export Format</label>
-            <div className="grid grid-cols-2 gap-2">
+            <div className="grid grid-cols-3 gap-2">
               {formats.map((format) => (
                 <button
                   key={format.id}
                   onClick={() => setSelectedFormat(format.id as any)}
-                  className={`flex items-center gap-3 p-3 rounded-xl transition-all ${
+                  className={`flex flex-col items-center text-center p-3 rounded-xl transition-all ${
                     selectedFormat === format.id ? 'ring-2 ring-purple-500' : ''
                   }`}
                   style={{
@@ -2449,11 +2446,8 @@ function ExportModal({
                     border: '1px solid rgba(0, 0, 0, 0.1)'
                   }}
                 >
-                  <span className="text-2xl">{format.icon}</span>
-                  <div className="text-left">
-                    <p className="text-sm font-medium" style={{ color: '#2D2D44' }}>{format.name}</p>
-                    <p className="text-xs" style={{ color: '#6B6B85' }}>{format.description}</p>
-                  </div>
+                  <p className="text-sm font-medium" style={{ color: '#2D2D44' }}>{format.name}</p>
+                  <p className="text-xs mt-0.5" style={{ color: '#6B6B85' }}>{format.description}</p>
                 </button>
               ))}
             </div>
