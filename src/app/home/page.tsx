@@ -361,7 +361,7 @@ function MyProjectsModal({ isOpen, onClose, onSelect }: { isOpen: boolean; onClo
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 backdrop-blur-sm bg-black/50" onClick={onClose}>
       <motion.div initial={{ scale: 0.95, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.95, opacity: 0 }} className="w-full max-w-md rounded-2xl p-6" style={{ background: 'rgba(255,255,255,0.95)' }} onClick={(e) => e.stopPropagation()}>
         <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-bold text-gray-800">My Collections</h3>
+          <h3 className="text-lg font-bold text-gray-800">My Workspaces</h3>
           <button onClick={onClose} className="p-2 rounded-lg hover:bg-gray-100 transition-colors text-sm text-gray-500">Close</button>
         </div>
 

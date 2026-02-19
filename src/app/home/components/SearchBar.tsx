@@ -43,7 +43,7 @@ export default function SearchBar({ onSearch, workspaces, onWorkspaceSelect, onQ
     // { icon: SparklesIcon, label: 'Research Hub', color: 'from-purple-500 to-pink-500' },
     { icon: CheckCircleIcon, label: 'Search KB', color: 'from-blue-500 to-cyan-500' },
     { icon: MapIcon, label: 'Initate Change', color: 'from-green-500 to-emerald-500' },
-    { icon: LightBulbIcon, label: 'Create Work Space', color: 'from-yellow-500 to-orange-500' },
+    { icon: LightBulbIcon, label: 'Create Workspace', color: 'from-yellow-500 to-orange-500' },
   ];
 
   const handleInputChange = (value: string) => {
@@ -288,8 +288,8 @@ export default function SearchBar({ onSearch, workspaces, onWorkspaceSelect, onQ
 
         {/* Quick Actions */}
         <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
           transition={{ duration: 0.6, delay: 0.8 }}
           className="flex items-center justify-center gap-3 mt-6 flex-wrap"
         >
@@ -298,10 +298,10 @@ export default function SearchBar({ onSearch, workspaces, onWorkspaceSelect, onQ
             return (
               <motion.button
                 key={action.label}
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
                 transition={{ duration: 0.4, delay: 0.9 + index * 0.1 }}
-                whileHover={{ scale: 1.05, y: -2 }}
+                whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={() => handleQuickAction(action.label)}
                 className="px-4 py-2.5 rounded-xl flex items-center gap-2 transition-all shadow-md hover:shadow-lg"
@@ -321,10 +321,10 @@ export default function SearchBar({ onSearch, workspaces, onWorkspaceSelect, onQ
 
             {/* My Collections button - opens the My Collections modal */}
             <motion.button
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
               transition={{ duration: 0.4, delay: 0.95 }}
-              whileHover={{ scale: 1.05, y: -2 }}
+              whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               onClick={() => onOpenMyProjects && onOpenMyProjects()}
               className="px-4 py-2.5 rounded-xl flex items-center gap-2 transition-all shadow-md hover:shadow-lg"
@@ -335,7 +335,7 @@ export default function SearchBar({ onSearch, workspaces, onWorkspaceSelect, onQ
               }}
             >
               <FolderIcon className="w-4 h-4 text-gray-600" />
-              <span className="text-sm font-medium text-gray-800">My Collections</span>
+              <span className="text-sm font-medium text-gray-800">My Workspaces</span>
             </motion.button>
         </motion.div>
 

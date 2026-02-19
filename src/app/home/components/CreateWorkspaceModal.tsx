@@ -279,7 +279,7 @@ export default function CreateWorkspaceModal({
                         Creating...
                       </>
                     ) : (
-                      'Create Project'
+                      'Create Workspace'
                     )}
                   </motion.button>
                 </div>
