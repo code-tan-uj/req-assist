@@ -634,6 +634,8 @@ export default function ProjectPage() {
     done: tasks.filter(t => t.status === 'done'),
   };
 
+  const [showAttachPopup, setShowAttachPopup] = useState(false);
+
   return (
     <div className="min-h-screen flex flex-col">
       <Navbar activeTab="projects" />
@@ -1069,11 +1071,26 @@ export default function ProjectPage() {
               <div ref={chatInputContainerRef} className="max-w-4xl mx-auto relative">
                 {/* Input Area */}
                 <div className="glass-card rounded-xl flex items-end gap-2 p-3">
-                  <button className="p-2 rounded-lg hover:bg-white/10 transition-colors" title="Attach file">
+                  <button
+                    className="p-2 rounded-lg hover:bg-white/10 transition-colors"
+                    title="Attach file"
+                    onClick={() => document.getElementById('fileInput')?.click()}
+                  >
                     <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"
+                      />
                     </svg>
                   </button>
+
+                  <input
+                    id="fileInput"
+                    type="file"
+                    className="hidden"
+                  />
 
                   <textarea
                     ref={inputRef}
@@ -1408,85 +1425,66 @@ export default function ProjectPage() {
                 style={{ background: '#ffffff', boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.25)' }}
               >
                 {/* Header */}
-                <div className="flex items-center justify-between p-5 border-b border-gray-200">
-                  <div>
-                    <h2 className="text-lg font-semibold text-gray-800">
-                      Add to Workspace
-                    </h2>
-                    <p className="text-xs mt-0.5 text-gray-500">
-                      Select a workspace to move <span className="font-medium text-purple-600">{projectTitle}</span>
-                    </p>
-                  </div>
-                  <button
-                    onClick={() => setShowAddToWorkspaceModal(false)}
-                    className="p-1 rounded-lg hover:bg-gray-100 transition-colors"
-                  >
-                    <svg className="w-6 h-6 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <div className="flex items-center justify-between p-5 border-b" style={{ borderColor: 'var(--color-border)' }}>
+                  <h2 className="text-lg font-bold" style={{ color: 'var(--color-foreground)' }}>
+                    Add to Workspace
+                  </h2>
+                  <button onClick={() => setShowAddToWorkspaceModal(false)} className="p-1.5 rounded hover:bg-white/10 transition-colors">
+                    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                     </svg>
                   </button>
                 </div>
 
-                {/* Workspace list */}
-                <div className="p-4 space-y-3 max-h-80 overflow-y-auto">
-                  {MOCK_WORKSPACES.map((ws) => {
-                    const isCurrent = ws.id === workspaceId;
-                    const isSelected = ws.id === pendingWorkspaceId;
-                    return (
-                      <button
-                        key={ws.id}
-                        onClick={() => setPendingWorkspaceId(ws.id)}
-                        className={`w-full text-left p-4 rounded-xl border transition-all ${
-                          isSelected
-                            ? 'border-purple-500 bg-purple-50 ring-2 ring-purple-200'
-                            : isCurrent
-                            ? 'border-purple-200 bg-purple-25'
-                            : 'border-gray-200 hover:bg-gray-50 hover:border-gray-300'
-                        }`}
-                      >
-                        <div className="flex items-start justify-between gap-3">
-                          <div className="flex-1 min-w-0">
-                            <div className="flex items-center gap-2 mb-1">
-                              <span className="text-sm font-semibold text-gray-800 truncate">
-                                {ws.name}
+                {/* Workspace List */}
+                <div className="p-5">
+                  <p className="text-sm text-gray-500 mb-4">
+                    Select a workspace to move this project into.
+                  </p>
+                  <div className="space-y-2">
+                    {MOCK_WORKSPACES.map((ws) => {
+                      const isCurrent = ws.id === workspaceId;
+                      const isSelected = ws.id === pendingWorkspaceId;
+                      return (
+                        <button
+                          key={ws.id}
+                          onClick={() => setPendingWorkspaceId(ws.id)}
+                          className={`w-full text-left p-4 rounded-xl transition-all flex items-center justify-between ${
+                            isSelected
+                              ? 'bg-purple-100 border-purple-500'
+                              : 'hover:bg-gray-50'
+                          }`}
+                          style={{
+                            border: '1px solid rgba(0, 0, 0, 0.1)',
+                            background: isSelected ? 'rgba(147, 51, 234, 0.1)' : 'transparent',
+                          }}
+                        >
+                          <div className="flex items-center gap-3">
+                            <div className="flex-shrink-0">
+                              <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h18v18H3V3z" />
+                              </svg>
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <p className="text-sm font-medium text-gray-800 truncate">{ws.name}</p>
+                              <p className="text-xs text-gray-500 truncate">{ws.description}</p>
+                            </div>
+                          </div>
+                          <div className="flex-shrink-0">
+                            {isCurrent ? (
+                              <span className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-green-100 text-green-600">
+                                Current
                               </span>
-                              {isCurrent && (
-                                <span className="flex-shrink-0 text-[10px] font-medium px-2 py-0.5 rounded-full bg-purple-100 text-purple-600">
-                                  Current
-                                </span>
-                              )}
-                              {isSelected && !isCurrent && (
-                                <span className="flex-shrink-0 text-[10px] font-medium px-2 py-0.5 rounded-full bg-green-100 text-green-600">
-                                  Selected
-                                </span>
-                              )}
-                            </div>
-                            <p className="text-xs text-gray-500 line-clamp-2 mb-2">
-                              {ws.description}
-                            </p>
-                            <div className="flex flex-wrap gap-1">
-                              {ws.tags.map((tag) => (
-                                <span
-                                  key={tag}
-                                  className="text-[10px] px-2 py-0.5 rounded-full bg-purple-50 text-purple-600"
-                                >
-                                  {tag}
-                                </span>
-                              ))}
-                            </div>
+                            ) : isSelected ? (
+                              <span className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-purple-100 text-purple-600">
+                                Selected
+                              </span>
+                            ) : null}
                           </div>
-                          <div className="flex-shrink-0 text-right">
-                            <span className="text-[10px] text-gray-500">
-                              {ws.projectCount} projects
-                            </span>
-                            <p className="text-[10px] text-gray-400 mt-0.5">
-                              {ws.updatedAt}
-                            </p>
-                          </div>
-                        </div>
-                      </button>
-                    );
-                  })}
+                        </button>
+                      );
+                    })}
+                  </div>
                 </div>
 
                 {/* Footer */}
@@ -1496,9 +1494,9 @@ export default function ProjectPage() {
                       setPendingWorkspaceId('');
                       setShowAddToWorkspaceModal(false);
                     }}
-                    className="px-4 py-2 text-sm rounded-xl font-medium bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors"
+                    className="px-4 py-2 rounded-lg text-gray-700 bg-gray-100 hover:bg-gray-200"
                   >
-                    Cancel
+                    Close
                   </button>
                   <button
                     disabled={!pendingWorkspaceId}
@@ -1511,7 +1509,7 @@ export default function ProjectPage() {
                       setPendingWorkspaceId('');
                       setShowAddToWorkspaceModal(false);
                     }}
-                    className="px-4 py-2 text-sm rounded-xl font-medium text-white disabled:opacity-40 disabled:cursor-not-allowed transition-all"
+                    className="px-4 py-2 rounded-lg font-medium text-white disabled:opacity-40 disabled:cursor-not-allowed transition-all"
                     style={{ background: 'linear-gradient(135deg, #9d7cc4 0%, #c4a0e8 50%, #e8c4f0 100%)' }}
                   >
                     Add to Workspace
@@ -1668,7 +1666,7 @@ function ConfigurationModal({
         <div className="flex items-center justify-between mb-6">
           <h2 className="text-2xl font-bold gradient-text">Configure Research Parameters</h2>
           <button onClick={onClose} className="p-2 rounded-lg hover:bg-gray-100 transition-colors">
-            <svg className="w-6 h-6" style={{ color: '#6B6B85' }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
             </svg>
           </button>
@@ -2324,8 +2322,12 @@ function CreateTaskModal({
                           </div>
                         </div>
                         <div className="flex-shrink-0 text-right">
-                          <span className="text-[10px] text-gray-500">{ws.projectCount} projects</span>
-                          <p className="text-[10px] text-gray-400 mt-0.5">{ws.updatedAt}</p>
+                          <span className="text-[10px] text-gray-500">
+                            {ws.projectCount} projects
+                          </span>
+                          <p className="text-[10px] text-gray-400 mt-0.5">
+                            {ws.updatedAt}
+                          </p>
                         </div>
                       </div>
                     </button>
@@ -2462,12 +2464,8 @@ function ExportModal({
                   key={option.id}
                   onClick={() => toggleContent(option.id)}
                   className={`w-full flex items-center gap-3 p-3 rounded-xl transition-colors ${
-                    selectedContent.includes(option.id) ? 'bg-purple-100' : 'hover:bg-gray-100'
+                    selectedContent.includes(option.id) ? 'bg-[var(--color-primary)] border-[var(--color-primary)]' : 'hover:bg-gray-100'
                   }`}
-                  style={{
-                    background: selectedContent.includes(option.id) ? 'rgba(147, 51, 234, 0.1)' : 'rgba(255, 255, 255, 0.8)',
-                    border: '1px solid rgba(0, 0, 0, 0.1)'
-                  }}
                 >
                   <div className={`w-5 h-5 rounded border-2 flex items-center justify-center ${
                     selectedContent.includes(option.id) ? 'bg-[var(--color-primary)] border-[var(--color-primary)]' : 'border-gray-400'
@@ -2503,7 +2501,8 @@ function ExportModal({
           <button
             onClick={handleExport}
             disabled={selectedContent.length === 0 || isExporting}
-            className="flex-1 px-6 py-3 rounded-xl font-medium text-white gradient-bg hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+            className="flex-1 px-6 py-3 rounded-xl font-medium text-white disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+            style={{ background: 'linear-gradient(135deg, #9d7cc4 0%, #c4a0e8 50%, #e8c4f0 100%)' }}
           >
             {isExporting ? (
               <>
