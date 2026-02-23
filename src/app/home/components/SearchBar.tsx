@@ -185,7 +185,7 @@ export default function SearchBar({ onSearch, workspaces, onWorkspaceSelect, onQ
             {/* Right: Model selector, mic, and submit */}
             <div className="flex items-center gap-3">
               {/* Model Selector */}
-              <motion.button
+              {/* <motion.button
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
                 className="flex items-center gap-2 px-3 py-1.5 rounded-lg hover:bg-white/5 transition-colors"
@@ -194,27 +194,16 @@ export default function SearchBar({ onSearch, workspaces, onWorkspaceSelect, onQ
                   {selectedModel}
                 </span>
                 <ChevronDownIcon className="w-4 h-4" style={{ color: 'var(--color-secondary-text)' }} />
-              </motion.button>
+              </motion.button> */}
 
-              {/* Microphone */}
-              <motion.button
-                whileHover={{ scale: 1.1 }}
-                whileTap={{ scale: 0.95 }}
-                className="w-9 h-9 rounded-full flex items-center justify-center hover:bg-white/5 transition-colors"
-                title="Voice input"
-              >
-                <MicrophoneIcon className="w-5 h-5" style={{ color: 'var(--color-secondary-text)' }} />
-              </motion.button>
-
-              {/* Submit Button */}
+              {/* Submit Button (always visible) */}
               <motion.button
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={handleSubmit}
-                disabled={!query.trim()}
-                className="w-10 h-10 rounded-full flex items-center justify-center transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+                className="w-10 h-10 rounded-full flex items-center justify-center transition-all"
                 style={{
-                  backgroundColor: query.trim() ? 'var(--color-primary)' : 'var(--color-border)',
+                  backgroundColor: 'var(--color-primary)',
                 }}
                 title="Submit"
               >
