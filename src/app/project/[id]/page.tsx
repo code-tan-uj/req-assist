@@ -28,7 +28,6 @@ import {
   EyeIcon,
   ArrowUpRightIcon,
   ArrowDownIcon,
-  // ArrowRightIcon and ArrowLeftIcon already imported above, remove duplicates
   Cog6ToothIcon,
   BoltIcon,
   ExclamationTriangleIcon,
@@ -52,7 +51,7 @@ import {
   Bars2Icon,
   Bars3BottomLeftIcon,
   Bars3BottomRightIcon,
-  // Removed invalid Heroicons imports
+  PaperClipIcon,
 } from '@heroicons/react/24/outline';
 
 // Types
@@ -197,10 +196,10 @@ const SIDEBAR_MENU = [
 ];
 
 const PROJECT_MANAGEMENT = [
-  { id: 'tasks', label: 'Tasks & Milestones', icon: <ClipboardDocumentListIcon className="w-5 h-5 text-primary" /> },
+  { id: 'tasks', label: 'Tasks', icon: <ClipboardDocumentListIcon className="w-5 h-5 text-primary" /> },
   { id: 'collaborators', label: 'Collaborators', icon: <UserGroupIcon className="w-5 h-5 text-primary" /> },
-  { id: 'schedule', label: 'Schedule', icon: <CalendarIcon className="w-5 h-5 text-primary" /> },
-  { id: 'status', label: 'Status Updates', icon: <ChartBarIcon className="w-5 h-5 text-primary" /> },
+  { id: 'files', label: 'Files', icon: <PaperClipIcon className="w-5 h-5 text-primary" /> },
+  { id: 'conversations', label: 'Conversations', icon: <ChartBarIcon className="w-5 h-5 text-primary" /> },
 ];
 
 // Mock data
@@ -760,10 +759,10 @@ export default function ProjectPage() {
                 <button
                   onClick={() => setShowAddToWorkspaceModal(true)}
                   className="w-full flex items-center gap-3 p-2 rounded-lg hover:bg-white/10 transition-colors"
-                  title="Add to Workspace"
+                  title="Add Chats to Workspace"
                 >
                   <span className="text-lg"><ArrowUpTrayIcon className="w-5 h-5 text-primary" /></span>
-                  {!sidebarCollapsed && <span className="text-sm">Add to Workspace</span>}
+                  {!sidebarCollapsed && <span className="text-sm">Add Chats to Workspace</span>}
                 </button>
               </div>
             </div>
@@ -828,7 +827,7 @@ export default function ProjectPage() {
               {/* Project Management Section */}
               {!sidebarCollapsed && (
                 <>
-                  <p className="text-xs font-medium uppercase tracking-wider mt-4 mb-2" style={{ color: 'var(--color-secondary-text)' }}>
+                  <p className="text-xs font-medium uppercase tracking-wider mt-1 mb-2" style={{ color: 'var(--color-secondary-text)' }}>
                     Project Management
                   </p>
                   {PROJECT_MANAGEMENT.map((item) => (
@@ -1427,7 +1426,7 @@ export default function ProjectPage() {
                 {/* Header */}
                 <div className="flex items-center justify-between p-5 border-b" style={{ borderColor: 'var(--color-border)' }}>
                   <h2 className="text-lg font-bold" style={{ color: 'var(--color-foreground)' }}>
-                    Add to Workspace
+                    Add Chats to Workspace
                   </h2>
                   <button onClick={() => setShowAddToWorkspaceModal(false)} className="p-1.5 rounded hover:bg-white/10 transition-colors">
                     <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -1989,7 +1988,7 @@ function CreateTaskModal({
                 : 'text-gray-500 hover:text-gray-700'
             }`}
           >
-            Add to Workspace
+            Add Chats to Workspace
             {activeTab === 'add-workspace' && (
               <motion.div
                 layoutId="activeModalTab"
@@ -2352,7 +2351,7 @@ function CreateTaskModal({
                     className="flex-1 px-6 py-3 rounded-xl font-medium text-white disabled:opacity-40 disabled:cursor-not-allowed transition-all"
                     style={{ background: 'linear-gradient(135deg, #9d7cc4 0%, #c4a0e8 50%, #e8c4f0 100%)' }}
                   >
-                    Add to Workspace
+                    Add Chats to Workspace
                   </button>
                 </div>
               </motion.div>
