@@ -1980,22 +1980,6 @@ function CreateTaskModal({
               />
             )}
           </button>
-          <button
-            onClick={() => setActiveTab('add-workspace')}
-            className={`flex-1 py-3 text-sm font-semibold transition-colors relative ${
-              activeTab === 'add-workspace'
-                ? 'text-purple-600'
-                : 'text-gray-500 hover:text-gray-700'
-            }`}
-          >
-            Add Chats to Workspace
-            {activeTab === 'add-workspace' && (
-              <motion.div
-                layoutId="activeModalTab"
-                className="absolute bottom-0 left-0 right-0 h-0.5 bg-purple-600"
-              />
-            )}
-          </button>
         </div>
 
         {/* Tab Content */}
