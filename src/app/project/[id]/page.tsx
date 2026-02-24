@@ -1032,7 +1032,7 @@ export default function ProjectPage() {
                 className="rounded-2xl w-full max-w-md pointer-events-auto overflow-hidden"
                 style={{ background: '#ffffff', boxShadow: '0 25px 50px -12px rgba(0,0,0,0.25)' }}
               >
-                <div className="flex items-center justify-between p-5 border-b" style={{ borderColor: 'var(--color-border)' }}>
+                <div className="flex items-center justify-between pb-1 p-5 border-b" style={{ borderColor: 'var(--color-border)' }}>
                   <h2 className="text-lg font-bold" style={{ color: 'var(--color-foreground)' }}>Add Chats to Workspace</h2>
                   <button onClick={() => setShowAddToWorkspaceModal(false)} className="p-1.5 rounded hover:bg-white/10 transition-colors">
                     <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -1040,8 +1040,8 @@ export default function ProjectPage() {
                     </svg>
                   </button>
                 </div>
-                <div className="p-5">
-                  <p className="text-sm text-gray-500 mb-4">Select a workspace to move this project into.</p>
+                <div className="pt-0 p-5">
+                  <p className="text-sm text-gray-500 mb-4">Existing workspaces</p>
                   <div className="space-y-2">
                     {MOCK_WORKSPACES.map((ws) => {
                       const isCurrent = ws.id === workspaceId;
