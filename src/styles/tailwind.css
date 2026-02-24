@@ -126,7 +126,7 @@
 }
 
 @layer utilities {
-  /* Glass Effect - Enhanced for Req-Assist */
+  /* Glass Effect - Enhanced for Req-Ease */
   .glass-panel {
     background: var(--color-card);
     backdrop-filter: blur(20px);

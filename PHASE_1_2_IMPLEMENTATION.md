@@ -1,7 +1,7 @@
-# Req-Assist UI Prototype - Phase 1 & 2 Implementation
+# Req-Ease UI Prototype - Phase 1 & 2 Implementation
 
 ## Overview
-This document outlines the implementation of Phase 1 (Foundation & Authentication) and Phase 2 (Core Navigation) for the Req-Assist AI Research Platform.
+This document outlines the implementation of Phase 1 (Foundation & Authentication) and Phase 2 (Core Navigation) for the Req-Ease AI Research Platform.
 
 ## ✅ Completed Features
 
@@ -27,7 +27,7 @@ This document outlines the implementation of Phase 1 (Foundation & Authenticatio
 
 **Features**:
 - Modern glassmorphism design with backdrop blur
-- Gradient "Req-Assist" branding
+- Gradient "Req-Ease" branding
 - Email and password fields with icons
 - Password show/hide toggle
 - Form validation with error messages
@@ -61,7 +61,7 @@ This document outlines the implementation of Phase 1 (Foundation & Authenticatio
 - Fixed position with glassmorphism effect
 - **Left Section**:
   - Gradient purple logo icon
-  - "Req-Assist" text with gradient effect
+  - "Req-Ease" text with gradient effect
   - "AI Research Platform" subtitle
 
 - **Center Section**:

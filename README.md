@@ -57,8 +57,8 @@ Before you begin, ensure you have the following installed:
 1. **Clone the repository**
 
    ```bash
-   git clone https://github.com/code-tan-uj/req-assist.git
-   cd req-assist
+   git clone https://github.com/code-tan-uj/req-ease.git
+   cd req-ease
    ```
 
 2. **Install dependencies**

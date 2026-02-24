@@ -1,6 +1,6 @@
-# Req-Assist Portal: Functional Features Overview
+# Req-Ease Portal: Functional Features Overview
 
-This document provides a comprehensive, non-technical overview of the main features and user journeys in the Req-Assist research portal. Each section describes what users can do, the purpose of each feature, and how it benefits the user.
+This document provides a comprehensive, non-technical overview of the main features and user journeys in the Req-Ease research portal. Each section describes what users can do, the purpose of each feature, and how it benefits the user.
 
 ---
 
@@ -106,4 +106,4 @@ This document provides a comprehensive, non-technical overview of the main featu
 
 ---
 
-This documentation is intended for product managers, designers, and stakeholders to understand the user-facing features and flows of the Req-Assist portal. For technical implementation details, refer to the codebase or developer documentation.
+This documentation is intended for product managers, designers, and stakeholders to understand the user-facing features and flows of the Req-Ease portal. For technical implementation details, refer to the codebase or developer documentation.

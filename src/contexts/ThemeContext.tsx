@@ -17,7 +17,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     setMounted(true);
     // Check localStorage and system preferences
-    const storedTheme = localStorage.getItem('req-assist-theme') as Theme;
+    const storedTheme = localStorage.getItem('req-ease-theme') as Theme;
     const systemTheme = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
     const initialTheme = storedTheme || systemTheme;
 
@@ -28,7 +28,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   const toggleTheme = () => {
     const newTheme = theme === 'light' ? 'dark' : 'light';
     setTheme(newTheme);
-    localStorage.setItem('req-assist-theme', newTheme);
+    localStorage.setItem('req-ease-theme', newTheme);
     document.documentElement.classList.toggle('dark', newTheme === 'dark');
   };
 

@@ -2,8 +2,8 @@ import type { Metadata } from 'next';
 import LoginForm from './components/LoginForm';
 
 export const metadata: Metadata = {
-  title: 'Login | Req-Assist',
-  description: 'Sign in to your Req-Assist workspace to access AI-powered research tools',
+  title: 'Login | Req-Ease',
+  description: 'Sign in to your Req-Ease workspace to access AI-powered research tools',
 };
 
 export default function LoginPage() {

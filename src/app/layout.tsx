@@ -11,7 +11,7 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
-  title: 'Req-Assist - AI Research Platform',
+  title: 'Req-Ease - AI Research Platform',
   description: 'AI-powered research platform for structured insights and workspace management',
   icons: {
     icon: [

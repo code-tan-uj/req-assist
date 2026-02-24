@@ -1692,7 +1692,7 @@ function ExportModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => void
 
 // Share Modal
 function ShareModal({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) {
-  const [shareLink] = useState('https://req-assist.com/share/abc123');
+  const [shareLink] = useState('https://req-ease.com/share/abc123');
   const [copied, setCopied] = useState(false);
   const [selectedUsers, setSelectedUsers] = useState<string[]>([]);
   const [permission, setPermission] = useState<'view' | 'edit' | 'comment'>('view');

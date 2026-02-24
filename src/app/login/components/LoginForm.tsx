@@ -59,7 +59,7 @@ export default function LoginForm() {
         className="text-center mb-8"
       >
         <h1 className="text-5xl font-bold gradient-text mb-3">
-          Req-Assist
+          Req-Ease
         </h1>
         <p className="text-lg" style={{ color: 'var(--color-secondary-text)' }}>
           Sign in to your workspace

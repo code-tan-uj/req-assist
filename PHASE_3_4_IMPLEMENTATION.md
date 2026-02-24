@@ -1,7 +1,7 @@
-# Req-Assist UI Prototype - Phase 3 & 4 Implementation
+# Req-Ease UI Prototype - Phase 3 & 4 Implementation
 
 ## Overview
-This document outlines the implementation of Phase 3 (Workspace & Project Pages) and Phase 4 (AI Research Interface) for the Req-Assist AI Research Platform.
+This document outlines the implementation of Phase 3 (Workspace & Project Pages) and Phase 4 (AI Research Interface) for the Req-Ease AI Research Platform.
 
 ## ✅ Completed Features
 

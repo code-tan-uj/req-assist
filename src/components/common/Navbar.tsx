@@ -49,7 +49,7 @@ export default function Navbar({ activeTab = 'workspace' }: NavbarProps) {
               </svg>
             </div>
             <div className="text-left">
-              <h1 className="text-xl font-bold gradient-text">Req-Assist</h1>
+              <h1 className="text-xl font-bold gradient-text">Req-Ease</h1>
               <p className="text-xs opacity-70" style={{ color: 'var(--color-secondary-text)' }}>
                 AI Research Platform
               </p>
