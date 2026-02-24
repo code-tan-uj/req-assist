@@ -309,33 +309,24 @@ export default function ProjectPage() {
     const mockSections: ResearchSection[] = [
       {
         id: `${timestamp}-1`,
-        title: 'Executive Summary',
-        content: 'The Loan Against Silver (LAS) market in India is experiencing accelerated growth, driven by rising silver prices, increased household silver holdings, and financial inclusion mandates. Key findings indicate a 32% YoY growth rate in silver-backed lending, with NBFCs and cooperative banks emerging as the dominant originators.',
-        icon: 'clipboard',
-      },
-      {
-        id: `${timestamp}-2`,
-        title: 'Market Overview',
-        content: 'The organized Loan Against Silver market is estimated at ₹38,000 Cr (FY2024), projected to reach ₹72,000 Cr by FY2028 at a CAGR of ~17%. India holds approximately 25,000 tonnes of household silver, of which only 6–8% is currently monetized through formal lending channels.',
-        icon: 'globe',
-      },
-      {
-        id: `${timestamp}-3`,
-        title: 'Competitive Landscape',
-        content: 'Key players include Muthoot Finance (market leader, ~22% share), Manappuram Finance (~18%), IIFL Finance (~12%), and a fragmented tail of 400+ NBFCs and cooperative banks. Credit losses remain low (<1.2% NPA) due to strong collateral liquidation markets.',
-        icon: 'chart',
-      },
-      {
-        id: `${timestamp}-4`,
-        title: 'Regulatory Framework',
-        content: 'RBI mandates a maximum LTV of 75% for loans against silver jewellery by NBFCs. Banks may extend up to 85% LTV under specific product structures. KYC norms require Aadhaar + PAN for loans above ₹50,000.',
-        icon: 'shield',
-      },
-      {
-        id: `${timestamp}-5`,
-        title: 'Opportunity & Recommendations',
-        content: 'Key opportunities: (1) Rural penetration — only 18% of LAS disbursals currently reach tier-3+ towns. (2) Digital pledge management — blockchain-based pledge certificates could reduce fraud. (3) Co-lending models — bank-NBFC partnerships can unlock lower cost of funds.',
-        icon: 'lightbulb',
+        title: 'Comprehensive Research Report',
+        content: `Executive summary: The Reserve Bank of India’s Lending Against Gold and Silver Collateral Directions (2025), effective April 1, 2026, establish a clear regulatory foundation for formal Loan Against Silver (LAS) products. India holds a very large household silver stock (conservative estimate: ~33,000 tonnes; upper estimates up to ~65,000 tonnes). Even modest formalization of this asset (1–2% monetization) creates a multi-thousand crore lending opportunity. Early-mover NBFCs with existing precious-metal lending infrastructure can capture meaningful share by piloting in high-propensity, rural and semi-urban geographies.
+
+Market overview & sizing: The organized LAS market today is effectively nascent, with pockets of informal lending. Benchmarking against the gold-loan segment and RBI projections suggests material upside: combined gold+silver loans could reach ~₹1.45 lakh crore by 2028, with silver growing from near-zero. Key product economics are driven by RBI LTV guidance: up to ~85% LTV for small-ticket loans (≤ ₹2.5L), ~80% for mid tickets (₹2.5–5L) and ~75% for larger exposures—these tiers enable clear pricing and underwriting bands.
+
+Competitive landscape: NBFCs experienced in gold lending (e.g., Muthoot, Manappuram, IIFL) are best positioned to scale rapidly due to branch networks, assaying capability, and vault infrastructure. Local co-operatives and small NBFCs have strong regional presence but limited compliance readiness. Fintechs can accelerate digital onboarding and doorstep assessment but require partner ecosystems for secure storage and physical handling.
+
+Demand drivers & geography: Silver is concentrated in rural and semi-urban households, making LAS a strong vehicle for financial inclusion. High-priority states: Rajasthan, Uttar Pradesh, Bihar, Odisha and Madhya Pradesh. Drivers include rural credit needs (seasonal agriculture), rising silver prices (industrial and investment demand), and a shift from informal pawnbrokers to regulated lenders due to improved disclosures and consumer protections.
+
+Operational risks & mitigations: Price volatility (silver is more cyclic than gold) requires conservative LTVs, daily price feeds (IBJA integration), and automated LTV monitoring. Storage and logistics costs are higher per unit of value; mitigate via regional vault partnerships and optimized logistics. Assaying gaps demand investments in training and mobile assaying pilots. Borrower education and vernacular onboarding reduce uptake friction.
+
+Go-to-market and product recommendations: 1) Pilot (50–100 branches) focused on high-silver states with mobile assaying, vernacular outreach, and IBJA price feeds; 2) Scale (300–500 branches) with a digital silver loan app, doorstep services, and co-lending playbooks to improve funding economics; 3) Consolidate with product extensions (lease/monetization) and NPL optimization. Pricing guidance (indicative): small tickets (~≤ ₹50k) 18–22% p.a.; core rural segment (₹50k–₹2.5L) 15–18% p.a.; larger tickets priced lower.
+
+Key metrics: loan conversion rate, time-to-disbursement, average ticket size, vintage NPA, branch-level AUM, and campaign-driven KB uptake. Pilot success criteria: stable vintage performance (target NPA <2% at pilot scale), repeat disbursal rates, and positive unit economics after operational costs.
+
+Conclusion: LAS represents a strategic, time-sensitive opportunity underpinned by regulatory clarity and a large latent collateral pool. With disciplined pilots, investments in assaying and vaulting, and targeted digital + field distribution, NBFCs can build a defensible secured lending franchise that accelerates rural inclusion and delivers sustainable AUM growth.
+`,
+        icon: 'document',
       },
     ];
 
